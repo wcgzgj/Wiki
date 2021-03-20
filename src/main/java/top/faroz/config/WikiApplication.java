@@ -1,20 +1,22 @@
 package top.faroz.config;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * 因为项目启动的时候，会提示DataSource的问题，从而导致项目无法启动，这里只能暂时加上
  */
-@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
-@ComponentScan("top.faroz")
+@SpringBootApplication
+@ComponentScan("top.faroz") //因为启动类移动了位置，所以需要为其加上注解，使其可以去扫描其他组件
+@MapperScan("top.faroz.mapper") //mybatis mapper接口扫描
 public class WikiApplication {
 
+    //配置了live template 模板后 可以使用  logf  快速生成
     private static final Logger LOG= LoggerFactory.getLogger(WikiApplication.class);
 
     public static void main(String[] args) {
