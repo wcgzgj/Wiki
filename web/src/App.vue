@@ -4,9 +4,7 @@
       <!-- 3. 使用组件-->
       <the-header></the-header>
       <router-view></router-view>
-      <a-layout-footer style="text-align: center">
-        Ant Design ©2018 Created by Ant UED
-      </a-layout-footer>
+      <the-footer></the-footer>
     </a-layout>
 
   </div>
@@ -16,12 +14,15 @@
 import Vue from 'vue';
 //1. 导入组件
 import TheHeader from './components/the-header.vue';
+import TheFooter from './components/the-footer.vue';
+
 
 export default Vue.extend({
   name: 'App',
   components: {
     //2. 放置组件
-    TheHeader
+    TheHeader,
+    TheFooter
   }
 });
 </script>
