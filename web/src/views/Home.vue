@@ -63,7 +63,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {defineComponent,onMounted,ref} from 'vue';
+import axios from 'axios';
+
 
 export default {
   name: 'Home',
@@ -71,10 +73,14 @@ export default {
   // setup() {
   //
   // },
-  mounted() {
-    console.log("setup");
-    axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
-      console.log(resp);
+
+  //当界面渲染好后，会去执行mounted()方法
+  setup() {
+    onMounted(()=> {
+      console.log("setup");
+      axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
+        console.log(resp);
+      })
     })
   },
   components: {

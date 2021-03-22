@@ -1,5 +1,7 @@
 package top.faroz.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import top.faroz.mapper.EbookMapper;
 import top.faroz.pojo.Ebook;
@@ -20,6 +22,7 @@ import java.util.List;
  **/
 @Service
 public class EbookService {
+    private static final Logger LOG= LoggerFactory.getLogger(EbookService.class);
 
     /**
      * Resource功能和@AutoWired差不多，只不过，Resource是JDK自带的
