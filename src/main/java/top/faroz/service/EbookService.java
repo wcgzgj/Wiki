@@ -17,6 +17,9 @@ import java.util.List;
 @Service
 public class EbookService {
 
+    /**
+     * Resource功能和@AutoWired差不多，只不过，Resource是JDK自带的
+     */
     @Resource
     private EbookMapper mapper;
 

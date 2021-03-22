@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.faroz.pojo.Ebook;
+import top.faroz.resp.CommonResp;
 import top.faroz.service.EbookService;
 
 import java.util.List;
@@ -24,8 +25,11 @@ public class EbookController {
 
 
     @RequestMapping("/list")
-    public List<Ebook> list() {
-        return ebookService.getList();
+    public CommonResp list() {
+        List<Ebook> list = ebookService.getList();
+        CommonResp<List<Ebook>> resp = new CommonResp<>();
+        resp.setContent(list);
+        return resp;
     }
 
 }
