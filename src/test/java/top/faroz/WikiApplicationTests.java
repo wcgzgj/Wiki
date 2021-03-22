@@ -8,6 +8,8 @@ class WikiApplicationTests {
 
     @Test
     void contextLoads() {
+
     }
+
 
 }

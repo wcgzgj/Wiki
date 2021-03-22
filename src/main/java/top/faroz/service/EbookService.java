@@ -1,15 +1,14 @@
 package top.faroz.service;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import top.faroz.mapper.EbookMapper;
 import top.faroz.pojo.Ebook;
 import top.faroz.pojo.EbookExample;
 import top.faroz.req.EbookReq;
 import top.faroz.resp.EbookResp;
+import top.faroz.util.CopyUtil;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,13 +39,7 @@ public class EbookService {
         //模糊查询
         criteria.andNameLike("%"+req.getName()+"%");
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);
-        ArrayList<EbookResp> ebookList = new ArrayList<>();
-        for (Ebook ebook : ebooks) {
-            EbookResp ebookResp = new EbookResp();
-            BeanUtils.copyProperties(ebook,ebookResp);
-            ebookList.add(ebookResp);
-        }
-        return ebookList;
+        return CopyUtil.copyList(ebooks,EbookResp.class);
     }
 
 
