@@ -63,9 +63,20 @@
 </template>
 
 <script>
+import axios from 'axios'
 
 export default {
   name: 'Home',
+  // vue3新增函数，在方法执行完后，再返回来执行这个
+  // setup() {
+  //
+  // },
+  mounted() {
+    console.log("setup");
+    axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
+      console.log(resp);
+    })
+  },
   components: {
   }
 }

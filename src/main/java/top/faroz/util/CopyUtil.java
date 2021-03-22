@@ -21,9 +21,6 @@ public class CopyUtil {
         if (source == null) {
             return null;
         }
-        if (!clazz.isInstance(source)) {
-            return null;
-        }
         T obj = null;
         try {
             obj = clazz.newInstance();
@@ -39,12 +36,6 @@ public class CopyUtil {
      * 列表复制
      */
     public static <T> List<T> copyList(List source, Class<T> clazz) {
-        if (source.size()==0) {
-            return null;
-        }
-        if (!clazz.isInstance(source.get(0))) {
-            return null;
-        }
         List<T> target = new ArrayList<>();
         if (!CollectionUtils.isEmpty(source)){
             for (Object c: source) {
