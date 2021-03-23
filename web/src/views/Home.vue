@@ -74,13 +74,11 @@
   </a-layout>
 </template>
 
+
+
 <script lang="ts">
   import {defineComponent, onMounted, ref} from 'vue';
   import axios from "axios";
-
-
-
-
 
 export default defineComponent({
   name: 'Home',
@@ -108,7 +106,7 @@ export default defineComponent({
 
     onMounted(()=>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
+      axios.get("http://localhost:8880/ebook/list").then(resp=>{
         // data是http的数据部分
         const data=resp.data;
         // content是我们自定义的CommonResp中的内容部分
@@ -124,3 +122,16 @@ export default defineComponent({
   }
 });
 </script>
+
+
+<style scoped>
+  /*这个class的获取，是在页面上，通过元素查找找到的，*/
+  /*在代码里面，antd把css都封装了，我们都看不到了*/
+  .ant-avatar {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 8%;
+    margin: 5px 0;
+  }
+</style>

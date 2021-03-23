@@ -3,6 +3,7 @@ package top.faroz.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import top.faroz.mapper.EbookMapper;
 import top.faroz.pojo.Ebook;
 import top.faroz.pojo.EbookExample;
@@ -39,8 +40,11 @@ public class EbookService {
     public List<EbookResp> list(EbookReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
-        //模糊查询
-        criteria.andNameLike("%"+req.getName()+"%");
+        //下面这个算动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
+        if (!ObjectUtils.isEmpty(req.getName())) {
+            //设置模糊查询条件
+            criteria.andNameLike("%"+req.getName()+"%");
+        }
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);
         return CopyUtil.copyList(ebooks,EbookResp.class);
     }
