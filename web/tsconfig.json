@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -35,9 +35,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
-  "typeRoots": [
-    "./types",
-    "./node_modules/vue/types"
   ]
 }

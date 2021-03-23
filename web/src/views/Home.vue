@@ -1,4 +1,5 @@
 <template>
+
   <a-layout>
     <a-layout-sider width="200" style="background: #fff">
       <a-menu
@@ -60,30 +61,16 @@
       Content
     </a-layout-content>
   </a-layout>
+
 </template>
 
-<script>
-import {defineComponent,onMounted,ref} from 'vue';
-import axios from 'axios';
 
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'Home',
-  // vue3新增函数，在方法执行完后，再返回来执行这个
-  // setup() {
-  //
-  // },
-
-  //当界面渲染好后，会去执行mounted()方法
-  setup() {
-    onMounted(()=> {
-      console.log("setup");
-      axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
-        console.log(resp);
-      })
-    })
-  },
   components: {
-  }
-}
+  },
+});
 </script>
