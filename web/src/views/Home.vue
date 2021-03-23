@@ -106,7 +106,7 @@ export default defineComponent({
 
     onMounted(()=>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/list").then(resp=>{
+      axios.get(process.env.VUE_APP_SERVER+"/ebook/list").then(resp=>{
         // data是http的数据部分
         const data=resp.data;
         // content是我们自定义的CommonResp中的内容部分
