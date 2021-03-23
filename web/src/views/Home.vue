@@ -9,7 +9,7 @@
               :style="{ height: '100%', borderRight: 0 }"
       >
         <a-sub-menu key="sub1">
-          <span slot="title"><a-icon type="user" />subnav 1</span>
+          <span slot="title">subnav 1</span>
           <a-menu-item key="1">
             option1
           </a-menu-item>
@@ -24,7 +24,7 @@
           </a-menu-item>
         </a-sub-menu>
         <a-sub-menu key="sub2">
-          <span slot="title"><a-icon type="laptop" />subnav 2</span>
+          <span slot="title">subnav 2</span>
           <a-menu-item key="5">
             option5
           </a-menu-item>
@@ -39,7 +39,7 @@
           </a-menu-item>
         </a-sub-menu>
         <a-sub-menu key="sub3">
-          <span slot="title"><a-icon type="notification" />subnav 3</span>
+          <span slot="title">subnav 3</span>
           <a-menu-item key="9">
             option9
           </a-menu-item>
@@ -58,7 +58,10 @@
     <a-layout-content
             :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      Content
+      <pre>
+{{ebooks}}
+      </pre>
+      <a-button type="primary">hello world</a-button>
     </a-layout-content>
   </a-layout>
 
@@ -66,11 +69,34 @@
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+  import { defineComponent ,onMounted , ref} from 'vue';
+  import axios from 'axios'
 
 export default defineComponent({
   name: 'Home',
   components: {
   },
+  setup() {
+    console.log("setup")
+    //ref()是一个响应式的数据
+    //还有一个方法，是使用reactive，但是太麻烦了，我不想用
+    const ebooks=ref();
+
+    onMounted(()=>{
+      console.log("onMounted");
+      axios.get("http://localhost:8880/ebook/list?name=Spring").then(resp=>{
+        console.log(resp)
+        const data=resp.data;
+        ebooks.value=data;
+      })
+    })
+
+    return {
+      //最后要把响应式数据ebooks返回，前端才可以拿到
+      ebooks
+    }
+  }
+
+
 });
 </script>
