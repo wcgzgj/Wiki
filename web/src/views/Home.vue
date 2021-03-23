@@ -105,7 +105,6 @@ export default defineComponent({
     const ebooks=ref();
 
     onMounted(()=>{
-      console.log("onMounted");
       axios.get("/ebook/list").then(resp=>{
         // data是http的数据部分
         const data=resp.data;
