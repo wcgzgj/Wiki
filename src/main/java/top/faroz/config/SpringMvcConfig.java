@@ -1,10 +1,8 @@
 package top.faroz.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import top.faroz.interceptor.LogInterceptor;
 
 /**
  * @ClassName SpringMvcConfig
@@ -19,8 +17,8 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     /**
      * 绑定自定义过滤器
      */
-    @Autowired
-    LogInterceptor logInterceptor;
+    // @Autowired
+    // LogInterceptor logInterceptor;
 
     // @Resource
     // LoginInterceptor loginInterceptor;
@@ -30,9 +28,9 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(logInterceptor)
-                .addPathPatterns("/**") //添加拦截路径
-                .excludePathPatterns("/login"); //设置排除的拦截路径
+        // registry.addInterceptor(logInterceptor)
+        //         .addPathPatterns("/**") //添加拦截路径
+        //         .excludePathPatterns("/login"); //设置排除的拦截路径
 
 
         // registry.addInterceptor(loginInterceptor)
