@@ -37,9 +37,12 @@
         name: 'AdminEbook',
         setup() {
             const ebooks = ref();
+
+            // 设定分页参数
+            // 固定是每次从第一页开始，每页查四行
             const pagination = ref({
                 current: 1,
-                pageSize: 2,
+                pageSize: 4,
                 total: 0
             });
             const loading = ref(false);
@@ -84,23 +87,34 @@
 
             /**
              * 数据查询
+             * params在下面的 onMounted函数中，我们已经定义了
              **/
-            const handleQuery = params => {
+            const handleQuery = (p) => {
                 loading.value = true;
-                axios.get("/ebook/list", params).then((response) => {
+                // axios传参的固定写法
+                // 第二个参数要写成 {params: 我们的参数}
+                axios.get("/ebook/list", {
+                    params: {
+                        page: p.page,
+                        size: p.size
+                    }
+                }).then((response) => {
                     loading.value = false;
                     const data = response.data;
-                    ebooks.value = data.content;
+                    // 因为content还封装了一个 PageResp
+                    // 所以要获取列表信息，还要再往下访问一层
+                    ebooks.value = data.content.list;
 
                     // 重置分页按钮
-                    pagination.value.current = params.page;
+                    pagination.value.current = p.page;
+                    pagination.value.total = data.content.total;
                 });
             };
 
             /**
              * 表格点击页码时触发
              */
-            const handleTableChange = pagination => {
+            const handleTableChange = (pagination) => {
                 console.log("看看自带的分页参数都有啥：" + pagination);
                 handleQuery({
                     page: pagination.current,
@@ -109,7 +123,10 @@
             };
 
             onMounted(() => {
-                handleQuery({});
+                handleQuery({
+                    page: 1,
+                    size: pagination.value.pageSize
+                });
             });
 
             return {
