@@ -105,11 +105,17 @@ export default defineComponent({
     const ebooks=ref();
 
     onMounted(()=>{
-      axios.get("/ebook/list").then(resp=>{
+      axios.get("/ebook/list",{
+        params: {
+          page:1,
+          size: 1000
+        }
+      }).then(resp=>{
         // data是http的数据部分
         const data=resp.data;
         // content是我们自定义的CommonResp中的内容部分
-        ebooks.value=data.content;
+        //又因为封装了一层 pageResp，所以需要再调用一层list
+        ebooks.value=data.content.list;
       })
     });
 
