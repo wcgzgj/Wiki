@@ -3,7 +3,7 @@ package top.faroz.req;
 /**
  * 将实体类，封装一层，专门作为请求
  */
-public class EbookReq {
+public class EbookReq extends PageReq{
     private Long id;
 
     private String name;
