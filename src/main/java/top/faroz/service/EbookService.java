@@ -1,5 +1,7 @@
 package top.faroz.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,18 @@ public class EbookService {
             //设置模糊查询条件
             criteria.andNameLike("%"+req.getName()+"%");
         }
+
+        PageHelper.startPage(1,2);
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);
+
+        //       泛型类型是元素类型             要传入查询到的数据列表
+        PageInfo<Ebook> info = new PageInfo<>(ebooks);
+        //总行数，指的是整个数据库表中所有数据的行数
+        LOG.info("总行数:{}"+info.getTotal());
+        //总页数，是根据总行数和每页设定的行数，计算出来的
+        LOG.info("总页数:{}"+info.getPages());
+
+
         return CopyUtil.copyList(ebooks,EbookResp.class);
     }
 

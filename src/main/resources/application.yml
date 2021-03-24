@@ -17,3 +17,6 @@ mybatis:
   # ** 表示在mapper下不管有多少文件夹，都可以全部识别
   mapper-locations: classpath:/mapper/**/*.xml
   type-aliases-package: top.faroz.pojo
+  #  打印sql相关的日志信息
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
