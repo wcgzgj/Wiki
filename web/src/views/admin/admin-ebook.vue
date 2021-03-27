@@ -3,11 +3,31 @@
         <a-layout-content
                 :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
-            <p>
-                <a-button type="primary" @click="add()" size="large">
-                    新增
-                </a-button>
-            </p>
+            <a-form
+                    layout="inline"
+                    :model="ebookState"
+                    @finish="handleQuery({page: 1,size: pagination.pageSize})"
+            >
+                <a-form-item>
+                    <a-input v-model:value="ebookState.name" placeholder="书籍名称">
+                    </a-input>
+                </a-form-item>
+                <a-form-item>
+                    <a-button
+                            type="primary"
+                            html-type="submit"
+                    >
+                        搜索
+                    </a-button>
+                </a-form-item>
+                <a-form-item>
+                    <a-button type="primary" @click="add()" >
+                        新增
+                    </a-button>
+                </a-form-item>
+            </a-form>
+
+
             <a-table
                     :columns="columns"
                     :row-key="record => record.id"
@@ -94,6 +114,10 @@
             });
             const loading = ref(false);
 
+            const ebookState =ref({
+                name: ""
+            });
+
             const columns = [
                 {
                     title: '封面',
@@ -132,6 +156,7 @@
                 }
             ];
 
+
             /**
              * 数据查询
              * params在下面的 onMounted函数中，我们已经定义了
@@ -145,7 +170,8 @@
                     // 不然如果后端有100w条数据，一次查出来，服务器就挂了
                     params: {
                         page: p.page,
-                        size: p.size
+                        size: p.size,
+                        name: ebookState.value.name
                     }
                 }).then((response) => {
                     loading.value=false;
@@ -275,6 +301,8 @@
                 columns,
                 loading,
                 handleTableChange,
+                ebookState,
+                handleQuery,
 
                 edit,
                 add,
