@@ -99,6 +99,7 @@
     import axios from "axios";
     // 下面这个组件，是为了方便显示后端传来的校验的
     import {message} from 'ant-design-vue';
+    import {Tool} from "@/util/tool";
 
     export default defineComponent({
         name: 'AdminEbook',
@@ -249,7 +250,9 @@
                 //而且，表单中的数据，也可以通过 ebook 来展示
                 //这个 ebook 进行了双向绑定
                 modalVisible.value = true;
-                ebook.value=record;
+
+                //编辑时复制对象，这样前端页面就不会在还没确认的情况下，响应式变化了
+                ebook.value=Tool.copy(record);
 
                 // 我发现，使用雪花算法后，前端传入的id值，会出现精度偏差
                 //所以，需要加入一个jackson配置，具体配置，我写在文档里了
