@@ -1,5 +1,7 @@
 package top.faroz.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.faroz.req.EbookQueryReq;
@@ -21,6 +23,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/ebook")
 public class EbookController {
+    private static final Logger LOG= LoggerFactory.getLogger(EbookController.class);
 
     @Autowired
     private EbookService ebookService;
@@ -42,11 +45,15 @@ public class EbookController {
     /**
      * 保存电子书
      * 要加上 @RequestBody 因为前段传来的是json格式，要将其转换成对象
+     * 加上 @Valid 注解，是为了开启校验
      * @param req
      * @return
      */
     @PostMapping("/save")
-    public CommonResp save(@RequestBody EbookSaveReq req) {
+    public CommonResp save(@RequestBody @Valid EbookSaveReq req) {
+
+        LOG.info("\n\n\n"+req+"\n\n\n");
+
         CommonResp resp = new CommonResp<>();
         ebookService.save(req);
         return resp;

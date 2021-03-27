@@ -1,8 +1,13 @@
 package top.faroz.req;
 
+import javax.validation.constraints.NotBlank;
+
 public class EbookSaveReq {
     private Long id;
 
+    // @NotNull(message = "【名称】不能为空")
+    //前端好像会传来一个空字符串，不是null，所以要 @NotBlank注解
+    @NotBlank(message = "【名称】不能为空")
     private String name;
 
     private Long category1Id;

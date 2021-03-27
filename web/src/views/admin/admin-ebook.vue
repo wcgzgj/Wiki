@@ -187,13 +187,14 @@
                 modalLoading.value = true;
                 axios.post("/ebook/save", ebook.value).then((response) => {
                     const data = response.data; // data 其实就是commenResp
+                    modalLoading.value = false;
                     if (data.success) { //commenResp里就有一个布尔值 success，判断是不是成功
 
                         // 保存成功以后，
                         // 去掉模态框 modal
                         // 去掉loading效果
                         modalVisible.value = false;
-                        modalLoading.value = false;
+
 
                         // 重新加载列表
                         // 使用之前定义过的 handleQuery 函数
@@ -201,6 +202,8 @@
                             page: pagination.value.current,
                             size: pagination.value.pageSize
                         });
+                    } else {
+                        message.error(data.message);
                     }
                 });
             };
@@ -224,7 +227,7 @@
 
                 // 我发现，使用雪花算法后，前端传入的id值，会出现精度偏差
                 //所以，需要加入一个jackson配置，具体配置，我写在文档里了
-                console.log("传入的一整行的值为："+JSON.stringify(record));
+                // console.log("传入的一整行的值为："+JSON.stringify(record));
             };
 
 
