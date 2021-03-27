@@ -9,6 +9,8 @@ import top.faroz.resp.EbookQueryResp;
 import top.faroz.resp.PageResp;
 import top.faroz.service.EbookService;
 
+import javax.validation.Valid;
+
 /**
  * @ClassName EbookController
  * @Description TODO
@@ -26,8 +28,9 @@ public class EbookController {
 
     //GET http://localhost:8880/ebook/list?name=Spring
     //上面的请求形式，Spring会自动映射，会将name映射到req中
+    //需要使用 @Valid开启校验规则 ，因为XxxReq都是集成自PageReq，PageReq上加了注解校验
     @RequestMapping("/list")
-    public CommonResp list(EbookQueryReq req) {
+    public CommonResp list(@Valid EbookQueryReq req) {
         PageResp<EbookQueryResp> list = ebookService.list(req);
         //这里用resp封装ebook的实体
         //在controller层，不要出现实体类domain!!

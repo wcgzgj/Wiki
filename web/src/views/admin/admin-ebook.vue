@@ -77,6 +77,8 @@
 <script>
     import {defineComponent, onMounted, ref} from 'vue';
     import axios from "axios";
+    // 下面这个组件，是为了方便显示后端传来的校验的
+    import {message} from 'ant-design-vue';
 
     export default defineComponent({
         name: 'AdminEbook',
@@ -139,21 +141,29 @@
                 // axios传参的固定写法
                 // 第二个参数要写成 {params: 我们的参数}
                 axios.get("/ebook/list", {
+                    // 后端查询也要进行分页
+                    // 不然如果后端有100w条数据，一次查出来，服务器就挂了
                     params: {
                         page: p.page,
                         size: p.size
                     }
                 }).then((response) => {
-                    loading.value = false;
-                    //data就相当于一个http数据包
+                    loading.value=false;
                     const data = response.data;
-                    // 因为content还封装了一个 PageResp
-                    // 所以要获取列表信息，还要再往下访问一层
-                    ebooks.value = data.content.list;
+                    if (data.success) {
+                        loading.value = false;
+                        //data就相当于一个http数据包
+                        const data = response.data;
+                        // 因为content还封装了一个 PageResp
+                        // 所以要获取列表信息，还要再往下访问一层
+                        ebooks.value = data.content.list;
 
-                    // 重置分页按钮
-                    pagination.value.current = p.page;
-                    pagination.value.total = data.content.total;
+                        // 重置分页按钮
+                        pagination.value.current = p.page;
+                        pagination.value.total = data.content.total;
+                    } else {
+                        message.error(data.message);
+                    }
                 });
             };
 
@@ -232,19 +242,18 @@
              * @param id 传进来的，要用来判断删除的id
              */
             const handelDelete=(id) => {
-                axios.delete("/ebook/delete/" + id)
-                    .then((response) => {
-                        const data = response.data;
-                        if (data.success) {
-                            //如果删除成功，要重新查询后端数据
-                            //从而能显示出是删除了一个数据
-                            handleQuery({
-                                page: pagination.value.current,
-                                size: pagination.value.pageSize
-                            });
-                        }
-                    });
-                };
+                axios.delete("/ebook/delete/" + id).then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        //如果删除成功，要重新查询后端数据
+                        //从而能显示出是删除了一个数据
+                        handleQuery({
+                            page: pagination.value.current,
+                            size: pagination.value.pageSize
+                        });
+                    }
+                });
+            };
 
 
             onMounted(() => {
