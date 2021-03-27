@@ -19,14 +19,29 @@
                 <template #cover="{ text: cover }">
                     <img v-if="cover" :src="cover" alt="avatar" />
                 </template>
-                <template v-slot:action="{ text, record }">
+
+                <template v-slot:action="{ record }">
                     <a-space size="small">
                         <a-button type="primary" @click="edit(record)">
                             编辑
                         </a-button>
-                        <a-button type="danger">
-                            删除
-                        </a-button>
+
+
+                        <!--气泡确认框-->
+                        <a-popconfirm
+                                title="删除后不可恢复，确认删除？"
+                                ok-text="确认"
+                                cancel-text="取消"
+                                @confirm="handelDelete(record.id)"
+                        >
+                            <!--delete是关键字，要用其他单词加以区分-->
+                            <a-button type="danger">
+                                删除
+                            </a-button>
+
+                        </a-popconfirm>
+
+
                     </a-space>
                 </template>
             </a-table>
@@ -130,6 +145,7 @@
                     }
                 }).then((response) => {
                     loading.value = false;
+                    //data就相当于一个http数据包
                     const data = response.data;
                     // 因为content还封装了一个 PageResp
                     // 所以要获取列表信息，还要再往下访问一层
@@ -197,6 +213,7 @@
                 ebook.value=record;
 
                 // 我发现，使用雪花算法后，前端传入的id值，会出现精度偏差
+                //所以，需要加入一个jackson配置，具体配置，我写在文档里了
                 console.log("传入的一整行的值为："+JSON.stringify(record));
             };
 
@@ -210,8 +227,29 @@
                 ebook.value={};
             };
 
+            /**
+             * 删除
+             * @param id 传进来的，要用来判断删除的id
+             */
+            const handelDelete=(id) => {
+                axios.delete("/ebook/delete/" + id)
+                    .then((response) => {
+                        const data = response.data;
+                        if (data.success) {
+                            //如果删除成功，要重新查询后端数据
+                            //从而能显示出是删除了一个数据
+                            handleQuery({
+                                page: pagination.value.current,
+                                size: pagination.value.pageSize
+                            });
+                        }
+                    });
+                };
+
 
             onMounted(() => {
+                //每次新打开这个页面的时候
+                //都必须查询所有数据，显示在页面上
                 handleQuery({
                     page: 1,
                     size: pagination.value.pageSize
@@ -228,6 +266,7 @@
 
                 edit,
                 add,
+                handelDelete,
 
                 ebook,
                 modalVisible,

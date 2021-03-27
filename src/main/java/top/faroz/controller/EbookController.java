@@ -1,10 +1,7 @@
 package top.faroz.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.faroz.req.EbookQueryReq;
 import top.faroz.req.EbookSaveReq;
 import top.faroz.resp.CommonResp;
@@ -49,6 +46,18 @@ public class EbookController {
     public CommonResp save(@RequestBody EbookSaveReq req) {
         CommonResp resp = new CommonResp<>();
         ebookService.save(req);
+        return resp;
+    }
+
+    /**
+     * 按照id，删除对应的元素
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delete/{id}")
+    public CommonResp delete(@PathVariable Long id) {
+        CommonResp resp = new CommonResp<>();
+        ebookService.delete(id);
         return resp;
     }
 

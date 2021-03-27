@@ -88,5 +88,13 @@ public class EbookService {
         }
     }
 
+    /**
+     * 根据主键删除元素
+     * @param id
+     */
+    public void delete(Long id) {
+        mapper.deleteByPrimaryKey(id);
+    }
+
 
 }
