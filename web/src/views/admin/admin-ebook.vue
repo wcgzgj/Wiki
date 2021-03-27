@@ -14,7 +14,7 @@
                 <template #cover="{ text: cover }">
                     <img v-if="cover" :src="cover" alt="avatar" />
                 </template>
-                <template v-slot:action="{record}">
+                <template v-slot:action="{ text, record }">
                     <a-space size="small">
                         <a-button type="primary" @click="edit(record)">
                             编辑
@@ -52,7 +52,6 @@
             </a-form-item>
         </a-form>
     </a-modal>
-
 </template>
 
 <script>
@@ -148,16 +147,31 @@
                 });
             };
 
+
             // -------- 表单 ---------
             const ebook=ref({});
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const handleModalOk = () => {
                 modalLoading.value = true;
-                setTimeout(() => {
-                    modalVisible.value = false;
-                    modalLoading.value = false;
-                }, 2000);
+                axios.post("/ebook/save", ebook.value).then((response) => {
+                    const data = response.data; // data 其实就是commenResp
+                    if (data.success) { //commenResp里就有一个布尔值 success，判断是不是成功
+
+                        // 保存成功以后，
+                        // 去掉模态框 modal
+                        // 去掉loading效果
+                        modalVisible.value = false;
+                        modalLoading.value = false;
+
+                        // 重新加载列表
+                        // 使用之前定义过的 handleQuery 函数
+                        handleQuery({
+                            page: pagination.value.current,
+                            size: pagination.value.pageSize
+                        });
+                    }
+                });
             };
 
             /**
@@ -171,6 +185,7 @@
             const edit = (record) => {
                 modalVisible.value = true;
                 ebook.value=record;
+                console.log("传入的一整行的值为："+JSON.stringify(record));
             };
 
 
@@ -180,6 +195,7 @@
                     size: pagination.value.pageSize
                 });
             });
+
 
             return {
                 ebooks,

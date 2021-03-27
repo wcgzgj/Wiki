@@ -9,8 +9,9 @@ import org.springframework.util.ObjectUtils;
 import top.faroz.mapper.EbookMapper;
 import top.faroz.pojo.Ebook;
 import top.faroz.pojo.EbookExample;
-import top.faroz.req.EbookReq;
-import top.faroz.resp.EbookResp;
+import top.faroz.req.EbookQueryReq;
+import top.faroz.req.EbookSaveReq;
+import top.faroz.resp.EbookQueryResp;
 import top.faroz.resp.PageResp;
 import top.faroz.util.CopyUtil;
 
@@ -40,7 +41,7 @@ public class EbookService {
      * @param req
      * @return
      */
-    public PageResp<EbookResp> list(EbookReq req) {
+    public PageResp<EbookQueryResp> list(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         //下面这个算动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
@@ -53,16 +54,32 @@ public class EbookService {
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);
 
         //列表复制，将原类型，更改为 resp类型
-        List<EbookResp> ebookResps = CopyUtil.copyList(ebooks, EbookResp.class);
+        List<EbookQueryResp> ebookResps = CopyUtil.copyList(ebooks, EbookQueryResp.class);
 
-        //       泛型类型是元素类型             要传入查询到的数据列表
+        //       泛型类型是元素类型             要传入 查询到的数据列表
         PageInfo<Ebook> info = new PageInfo<>(ebooks);
 
-        PageResp<EbookResp> pageResp = new PageResp<>();
+        PageResp<EbookQueryResp> pageResp = new PageResp<>();
         pageResp.setTotal(info.getTotal());
         pageResp.setList(ebookResps);
 
         return pageResp;
+    }
+
+    /**
+     * 保存
+     * 这里的保存，既要支持新增，也要支持更新
+     * 是保存，还是新增，判断的依据是  req的id是否为空
+     */
+    public void save(EbookSaveReq req) {
+        Ebook ebook=CopyUtil.copy(req,Ebook.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
+            //新增
+            mapper.insert(ebook);
+        } else {
+            //更新
+            mapper.updateByPrimaryKey(ebook);
+        }
     }
 
 

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EbookResp {
-    // private Long id;
+public class EbookQueryResp {
+    private Long id;
 
     private String name;
 
