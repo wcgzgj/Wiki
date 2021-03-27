@@ -3,6 +3,11 @@
         <a-layout-content
                 :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
+            <p>
+                <a-button type="primary" @click="add()" size="large">
+                    新增
+                </a-button>
+            </p>
             <a-table
                     :columns="columns"
                     :row-key="record => record.id"
@@ -48,7 +53,7 @@
                 <a-input v-model:value="ebook.category2Id" />
             </a-form-item>
             <a-form-item label="描述">
-                <a-input v-model:value="ebook.desc" type="textarea" />
+                <a-input v-model:value="ebook.description" type="textarea" />
             </a-form-item>
         </a-form>
     </a-modal>
@@ -183,9 +188,26 @@
              * ()里面可以放参数
              */
             const edit = (record) => {
+                //因为整个页面中隐藏了一个表单
+                //我们点击edit以后，就会把这个隐藏的属性，设置为可见
+                //这样，就可以出现一个供我们编辑的表单了
+                //而且，表单中的数据，也可以通过 ebook 来展示
+                //这个 ebook 进行了双向绑定
                 modalVisible.value = true;
                 ebook.value=record;
+
+                // 我发现，使用雪花算法后，前端传入的id值，会出现精度偏差
                 console.log("传入的一整行的值为："+JSON.stringify(record));
+            };
+
+
+            /**
+             * 新增
+             */
+            const add = () => {
+                modalVisible.value = true;
+                //因为在新增的时候,我们不希望表单中有初始数据
+                ebook.value={};
             };
 
 
@@ -205,6 +227,7 @@
                 handleTableChange,
 
                 edit,
+                add,
 
                 ebook,
                 modalVisible,

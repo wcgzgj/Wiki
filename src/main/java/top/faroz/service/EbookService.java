@@ -14,6 +14,7 @@ import top.faroz.req.EbookSaveReq;
 import top.faroz.resp.EbookQueryResp;
 import top.faroz.resp.PageResp;
 import top.faroz.util.CopyUtil;
+import top.faroz.util.SnowFlake;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -34,6 +35,9 @@ public class EbookService {
      */
     @Resource
     private EbookMapper mapper;
+
+    @Resource
+    private SnowFlake snowFlake;
 
 
     /**
@@ -74,7 +78,9 @@ public class EbookService {
     public void save(EbookSaveReq req) {
         Ebook ebook=CopyUtil.copy(req,Ebook.class);
         if (ObjectUtils.isEmpty(req.getId())) {
+
             //新增
+            ebook.setId(snowFlake.nextId());
             mapper.insert(ebook);
         } else {
             //更新
