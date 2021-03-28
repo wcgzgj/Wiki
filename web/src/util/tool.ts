@@ -30,8 +30,10 @@ export class Tool {
     /**
      * 使用递归将数组转为树形结构
      * 父ID属性为parent
+     * 当初始调用的时候，因为所有的一级标签的parentID都是0，所以parentID要传入0
      */
     public static array2Tree (array: any, parentId: number) {
+        // 终止条件
         if (Tool.isEmpty(array)) {
             return [];
         }
@@ -39,13 +41,13 @@ export class Tool {
         const result = [];
         for (let i = 0; i < array.length; i++) {
             const c = array[i];
-            // console.log(Number(c.parent), Number(parentId));
             if (Number(c.parent) === Number(parentId)) {
+                // 找出一级标签节点
                 result.push(c);
-
-                // 递归查看当前节点对应的子节点
+                // 找出所有父节点是一级标签的节点
                 const children = Tool.array2Tree(array, c.id);
                 if (Tool.isNotEmpty(children)) {
+                    // js真jb乱来，可以往对象里面随便塞其他对象
                     c.children = children;
                 }
             }

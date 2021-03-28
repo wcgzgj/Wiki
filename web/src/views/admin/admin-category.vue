@@ -30,7 +30,6 @@
                     :data-source="level1"
                     :pagination="false"
                     :loading="loading"
-                    @change="handleTableChange"
             >
                 <template #cover="{ text: cover }">
                     <img v-if="cover" :src="cover" alt="avatar" />
@@ -75,7 +74,18 @@
                 <a-input v-model:value="category.name" />
             </a-form-item>
             <a-form-item label="父分类">
-                <a-input v-model:value="category.parent" />
+                <a-select
+                        v-model:value="category.parent"
+                        ref="select"
+                >
+                    <a-select-option value="0">
+                        无
+                    </a-select-option>
+                    <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">
+                        {{c.name}}
+                    </a-select-option>
+                </a-select>
+
             </a-form-item>
             <a-form-item label="顺序">
                 <a-input v-model:value="category.sort" />
@@ -133,7 +143,7 @@
              **/
             const handleQuery = () => {
                 loading.value = true;
-                axios.get("/category/list", {
+                axios.get("/category/all", {
                     params: {
                         name: categoryState.value.name
                     }
@@ -142,7 +152,7 @@
                     const data = response.data;
                     if (data.success) {
                         const data = response.data;
-                        categorys.value = data.content.list;
+                        categorys.value = data.content;
                         level1.value=[];
                         level1.value=Tool.array2Tree(categorys.value,0);
 
