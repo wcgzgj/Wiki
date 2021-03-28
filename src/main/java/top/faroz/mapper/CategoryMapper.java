@@ -1,10 +1,9 @@
 package top.faroz.mapper;
 
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import top.faroz.pojo.Category;
 import top.faroz.pojo.CategoryExample;
-
-import java.util.List;
 
 public interface CategoryMapper {
     long countByExample(CategoryExample example);
