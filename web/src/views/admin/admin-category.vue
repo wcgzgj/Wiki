@@ -13,7 +13,7 @@
                             type="primary"
                             html-type="submit"
                     >
-                        搜索
+                        查询
                     </a-button>
                 </a-form-item>
                 <a-form-item>
