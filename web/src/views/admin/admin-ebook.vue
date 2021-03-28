@@ -163,6 +163,7 @@
              * params在下面的 onMounted函数中，我们已经定义了
              **/
             const handleQuery = (p) => {
+                //加载成功前，显示loading图标
                 loading.value = true;
                 // axios传参的固定写法
                 // 第二个参数要写成 {params: 我们的参数}
@@ -178,11 +179,8 @@
                     loading.value=false;
                     const data = response.data;
                     if (data.success) {
-                        loading.value = false;
-                        //data就相当于一个http数据包
                         const data = response.data;
-                        // 因为content还封装了一个 PageResp
-                        // 所以要获取列表信息，还要再往下访问一层
+                        //获取所有电子书信息
                         ebooks.value = data.content.list;
 
                         // 重置分页按钮
@@ -198,7 +196,7 @@
              * 表格点击页码时触发
              */
             const handleTableChange = (pagination) => {
-                console.log("看看自带的分页参数都有啥：" + pagination);
+                console.log("看看自带的分页参数都有啥：" + JSON.stringify(pagination));
                 handleQuery({
                     page: pagination.current,
                     size: pagination.pageSize

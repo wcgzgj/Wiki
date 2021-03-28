@@ -108,6 +108,7 @@ export default defineComponent({
       axios.get("/ebook/list",{
         params: {
           page:1,
+          //因为我们知道，电子书的个数不会超过1000，所以这里我们写死了
           size: 1000
         }
       }).then(resp=>{

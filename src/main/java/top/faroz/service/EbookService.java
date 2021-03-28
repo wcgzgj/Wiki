@@ -52,9 +52,10 @@ public class EbookService {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
 
-        LOG.info("\n\n\n"+req+"\n\n\n");
 
-        //下面这个算动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
+        /**
+         * 动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
+         */
         if (!ObjectUtils.isEmpty(req.getName())) {
             //设置模糊查询条件
             criteria.andNameLike("%"+req.getName()+"%");
