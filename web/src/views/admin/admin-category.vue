@@ -9,10 +9,6 @@
                     @finish="handleQuery({page: 1,size: pagination.pageSize})"
             >
                 <a-form-item>
-                    <a-input v-model:value="categoryState.name" placeholder="分类名称">
-                    </a-input>
-                </a-form-item>
-                <a-form-item>
                     <a-button
                             type="primary"
                             html-type="submit"
@@ -32,7 +28,7 @@
                     :columns="columns"
                     :row-key="record => record.id"
                     :data-source="categorys"
-                    :pagination="pagination"
+                    :pagination="false"
                     :loading="loading"
                     @change="handleTableChange"
             >
@@ -100,13 +96,6 @@
         setup() {
             const categorys = ref();
 
-            // 设定分页参数
-            // 固定是每次从第一页开始，每页查四行
-            const pagination = ref({
-                current: 1,
-                pageSize: 4,
-                total: 0
-            });
             const loading = ref(false);
 
             const categoryState =ref({
@@ -129,7 +118,7 @@
                     dataIndex: 'sort'
                 },
                 {
-                    title: 'Action',
+                    title: '操作',
                     key: 'action',
                     slots: { customRender: 'action' }
                 }
@@ -140,17 +129,10 @@
              * 数据查询
              * params在下面的 onMounted函数中，我们已经定义了
              **/
-            const handleQuery = (p) => {
-                //加载成功前，显示loading图标
+            const handleQuery = () => {
                 loading.value = true;
-                // axios传参的固定写法
-                // 第二个参数要写成 {params: 我们的参数}
                 axios.get("/category/list", {
-                    // 后端查询也要进行分页
-                    // 不然如果后端有100w条数据，一次查出来，服务器就挂了
                     params: {
-                        page: p.page,
-                        size: p.size,
                         name: categoryState.value.name
                     }
                 }).then((response) => {
@@ -161,25 +143,12 @@
                         //获取所有分类信息
                         categorys.value = data.content.list;
 
-                        // 重置分页按钮
-                        pagination.value.current = p.page;
-                        pagination.value.total = data.content.total;
                     } else {
                         message.error(data.message);
                     }
                 });
             };
 
-            /**
-             * 表格点击页码时触发
-             */
-            const handleTableChange = (pagination) => {
-                console.log("看看自带的分页参数都有啥：" + JSON.stringify(pagination));
-                handleQuery({
-                    page: pagination.current,
-                    size: pagination.pageSize
-                });
-            };
 
 
             // -------- 表单 ---------
@@ -201,10 +170,7 @@
 
                         // 重新加载列表
                         // 使用之前定义过的 handleQuery 函数
-                        handleQuery({
-                            page: pagination.value.current,
-                            size: pagination.value.pageSize
-                        });
+                        handleQuery();
                     } else {
                         message.error(data.message);
                     }
@@ -255,10 +221,7 @@
                     if (data.success) {
                         //如果删除成功，要重新查询后端数据
                         //从而能显示出是删除了一个数据
-                        handleQuery({
-                            page: pagination.value.current,
-                            size: pagination.value.pageSize
-                        });
+                        handleQuery();
                     }
                 });
             };
@@ -267,19 +230,14 @@
             onMounted(() => {
                 //每次新打开这个页面的时候
                 //都必须查询所有数据，显示在页面上
-                handleQuery({
-                    page: 1,
-                    size: pagination.value.pageSize
-                });
+                handleQuery();
             });
 
 
             return {
                 categorys,
-                pagination,
                 columns,
                 loading,
-                handleTableChange,
                 categoryState,
                 handleQuery,
 

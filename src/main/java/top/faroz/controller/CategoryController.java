@@ -12,6 +12,7 @@ import top.faroz.resp.PageResp;
 import top.faroz.service.CategoryService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @ClassName CategoryController
@@ -27,6 +28,15 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+
+    @RequestMapping("/all")
+    public CommonResp all() {
+        List<CategoryQueryResp> all = categoryService.all();
+        CommonResp<List<CategoryQueryResp>> resp = new CommonResp<>();
+        resp.setContent(all);
+        return resp;
+    }
 
 
     @RequestMapping("/list")

@@ -44,6 +44,42 @@ public class CategoryService {
 
 
     /**
+     * 返回所有分类数据
+     * 因为前端不需要分页，所以返回值只要是list就行
+     * @return
+     */
+    public List<CategoryQueryResp> all() {
+        CategoryExample categoryExample = new CategoryExample();
+        /**
+         * 自动生成的sql是这样的
+         * <select id="selectByExample" parameterType="top.faroz.pojo.CategoryExample" resultMap="BaseResultMap">
+         *     select
+         *     <if test="distinct">
+         *       distinct
+         *     </if>
+         *     <include refid="Base_Column_List" />
+         *     from category
+         *     <if test="_parameter != null">
+         *       <include refid="Example_Where_Clause" />
+         *     </if>
+         *     <if test="orderByClause != null">
+         *       order by ${orderByClause}
+         *     </if>
+         *   </select>
+         *
+         *   最后的order by 会拼接上我们写的内容
+         *   即会成为 order by sort acs，即通过sort的升序排列
+         */
+        categoryExample.setOrderByClause("sort asc");
+        List<Category> categorys = mapper.selectByExample(categoryExample);
+
+        //列表复制，将原类型，更改为 resp类型
+        List<CategoryQueryResp> categoryResps = CopyUtil.copyList(categorys, CategoryQueryResp.class);
+        return categoryResps;
+    }
+
+
+    /**
      * 模糊查询，查出有req中名字部分的书籍
      * @param req
      * @return
