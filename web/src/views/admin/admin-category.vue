@@ -27,7 +27,7 @@
             <a-table
                     :columns="columns"
                     :row-key="record => record.id"
-                    :data-source="categorys"
+                    :data-source="level1"
                     :pagination="false"
                     :loading="loading"
                     @change="handleTableChange"
@@ -102,6 +102,8 @@
                 name: ""
             });
 
+            const level1=ref();
+
             const columns = [
                 {
                     title: '名称',
@@ -140,8 +142,9 @@
                     const data = response.data;
                     if (data.success) {
                         const data = response.data;
-                        //获取所有分类信息
                         categorys.value = data.content.list;
+                        level1.value=[];
+                        level1.value=Tool.array2Tree(categorys.value,0);
 
                     } else {
                         message.error(data.message);
@@ -240,6 +243,7 @@
                 loading,
                 categoryState,
                 handleQuery,
+                level1,
 
                 edit,
                 add,
