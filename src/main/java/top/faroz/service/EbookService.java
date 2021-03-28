@@ -60,6 +60,9 @@ public class EbookService {
             //设置模糊查询条件
             criteria.andNameLike("%"+req.getName()+"%");
         }
+        if (!ObjectUtils.isEmpty(req.getCategoryId2())) {
+            criteria.andCategory2IdEqualTo(req.getCategoryId2());
+        }
 
         PageHelper.startPage(req.getPage(),req.getSize());
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);

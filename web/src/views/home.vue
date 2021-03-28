@@ -115,30 +115,41 @@
 
 
     const isShowWelcome = ref(true);
+    let categoryId2 =0;
+
+
+
+
+
 
     const handleClick = (value: any) => {
       console.log("menu click", value)
       if (value.key === 'welcome') {
         isShowWelcome.value = true;
       } else {
+        categoryId2=value.key;
         isShowWelcome.value = false;
+        handelQueryEbook();
       }
       // isShowWelcome.value = value.key === 'welcome';
     };
 
-
-    onMounted(()=>{
-      handleQueryCategory();
+    const handelQueryEbook = () => {
       axios.get("/ebook/list",{
         params: {
           page:1,
           //因为我们知道，电子书的个数不会超过1000，所以这里我们写死了
-          size: 1000
+          size: 1000,
+          categoryId2: categoryId2
         }
       }).then(resp=>{
         const data=resp.data;
         ebooks.value=data.content.list;
       })
+    };
+
+    onMounted(()=>{
+      handleQueryCategory();
     });
 
     return {
