@@ -1,98 +1,112 @@
 <template>
+
+
+
     <a-layout>
         <a-layout-content
                 :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
-            <a-form
-                    layout="inline"
-                    :model="docState"
-                    @finish="handleQuery({page: 1,size: pagination.pageSize})"
-            >
-                <a-form-item>
-                    <a-button
-                            type="primary"
-                            html-type="submit"
-                    >
-                        查询
-                    </a-button>
-                </a-form-item>
-                <a-form-item>
-                    <a-button type="primary" @click="add()" >
-                        新增
-                    </a-button>
-                </a-form-item>
-            </a-form>
-
-
-            <a-table
-                    :columns="columns"
-                    :row-key="record => record.id"
-                    :data-source="level1"
-                    :pagination="false"
-                    :loading="loading"
-            >
-                <template #cover="{ text: cover }">
-                    <img v-if="cover" :src="cover" alt="avatar" />
-                </template>
-
-                <template v-slot:action="{ record }">
-                    <a-space size="small">
-                        <a-button type="primary" @click="edit(record)">
-                            编辑
-                        </a-button>
-
-                        <!--气泡确认框-->
-                        <a-popconfirm
-                                title="删除后不可恢复，确认删除？"
-                                ok-text="确认"
-                                cancel-text="取消"
-                                @confirm="handelDelete(record.id)"
+            <a-row>
+                <a-col :span="8">
+                    <p>
+                        <a-form
+                                layout="inline"
+                                :model="docState"
+                                @finish="handleQuery({page: 1,size: pagination.pageSize})"
                         >
-                            <!--delete是关键字，要用其他单词加以区分-->
-                            <a-button type="danger">
-                                删除
-                            </a-button>
+                            <a-form-item>
+                                <a-button
+                                        type="primary"
+                                        html-type="submit"
+                                >
+                                    查询
+                                </a-button>
+                            </a-form-item>
+                            <a-form-item>
+                                <a-button type="primary" @click="add()" >
+                                    新增
+                                </a-button>
+                            </a-form-item>
+                        </a-form>
+                    </p>
+                    <a-table
+                            :columns="columns"
+                            :row-key="record => record.id"
+                            :data-source="level1"
+                            :pagination="false"
+                            :loading="loading"
+                    >
+                        <template #cover="{ text: cover }">
+                            <img v-if="cover" :src="cover" alt="avatar" />
+                        </template>
 
-                        </a-popconfirm>
+                        <template v-slot:action="{ record }">
+                            <a-space size="small">
+                                <a-button type="primary" @click="edit(record)">
+                                    编辑
+                                </a-button>
+
+                                <!--气泡确认框-->
+                                <a-popconfirm
+                                        title="删除后不可恢复，确认删除？"
+                                        ok-text="确认"
+                                        cancel-text="取消"
+                                        @confirm="handelDelete(record.id)"
+                                >
+                                    <!--delete是关键字，要用其他单词加以区分-->
+                                    <a-button type="danger">
+                                        删除
+                                    </a-button>
+
+                                </a-popconfirm>
 
 
-                    </a-space>
-                </template>
-            </a-table>
+                            </a-space>
+                        </template>
+                    </a-table>
+                </a-col>
+
+
+                <a-col :span="16">
+                    <!--<a-modal-->
+                    <!--        title="文档表单"-->
+                    <!--        v-model:visible="modalVisible"-->
+                    <!--        :confirm-loading="modalLoading"-->
+                    <!--        @ok="handleModalOk"-->
+                    <!--&gt;-->
+                    <!--    -->
+                    <!--</a-modal>-->
+                    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                        <a-form-item label="名称">
+                            <a-input v-model:value="doc.name" />
+                        </a-form-item>
+                        <a-form-item label="父文档">
+                            <a-tree-select
+                                    v-model:value="doc.parent"
+                                    style="width: 100%"
+                                    :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                                    :tree-data="treeSelectData"
+                                    placeholder="请选择父文档"
+                                    tree-default-expand-all
+                                    :replaceFields="{title: 'name',key: 'id',value: 'id'}"
+                            >
+                            </a-tree-select>
+                        </a-form-item>
+
+                        <a-form-item label="顺序">
+                            <a-input v-model:value="doc.sort" />
+                        </a-form-item>
+                        <a-form-item label="内容">
+                            <!--下面放置的内容，是富文本编辑器-->
+                            <div id="content"></div>
+                        </a-form-item>
+                    </a-form>
+                </a-col>
+
+            </a-row>
+
         </a-layout-content>
     </a-layout>
-
-    <a-modal
-            title="文档表单"
-            v-model:visible="modalVisible"
-            :confirm-loading="modalLoading"
-            @ok="handleModalOk"
-    >
-        <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-            <a-form-item label="名称">
-                <a-input v-model:value="doc.name" />
-            </a-form-item>
-            <a-form-item label="父文档">
-                <a-tree-select
-                        v-model:value="doc.parent"
-                        style="width: 100%"
-                        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-                        :tree-data="treeSelectData"
-                        placeholder="请选择父文档"
-                        tree-default-expand-all
-                        :replaceFields="{title: 'name',key: 'id',value: 'id'}"
-                >
-                </a-tree-select>
-            </a-form-item>
-
-            <a-form-item label="顺序">
-                <a-input v-model:value="doc.sort" />
-            </a-form-item>
-            <a-form-item label="内容">
-                <div id="content"></div>
-            </a-form-item>
-        </a-form>
-    </a-modal>
 </template>
 
 <script>
@@ -109,13 +123,6 @@
         name: 'AdminDoc',
         setup() {
             const route=useRoute();
-            // console.log("路由：", route);
-            // console.log("route.path：", route.path);
-            // console.log("route.query：", route.query);
-            // console.log("route.param：", route.params);
-            // console.log("route.fullPath：", route.fullPath);
-            // console.log("route.name：", route.name);
-            // console.log("route.meta：", route.meta);
 
             const docs = ref();
 
@@ -361,6 +368,9 @@
                 //每次新打开这个页面的时候
                 //都必须查询所有数据，显示在页面上
                 handleQuery();
+                // setTimeout(function () {
+                //     editor.create();
+                // }, 100);
             });
 
 
