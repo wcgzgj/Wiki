@@ -99,10 +99,20 @@
     // 下面这个组件，是为了方便显示后端传来的校验的
     import {message} from 'ant-design-vue';
     import {Tool} from "@/util/tool";
+    import {useRoute} from "vue-router";
 
     export default defineComponent({
         name: 'AdminDoc',
         setup() {
+            const route=useRoute();
+            console.log("路由：", route);
+            console.log("route.path：", route.path);
+            console.log("route.query：", route.query);
+            console.log("route.param：", route.params);
+            console.log("route.fullPath：", route.fullPath);
+            console.log("route.name：", route.name);
+            console.log("route.meta：", route.meta);
+
             const docs = ref();
 
             const loading = ref(false);
@@ -253,7 +263,10 @@
             const add = () => {
                 modalVisible.value = true;
                 //因为在新增的时候,我们不希望表单中有初始数据
-                doc.value={};
+                doc.value={
+                    //获取 url 中传入的 ebookId 信息
+                    ebookId: route.query.ebookId
+                };
 
                 treeSelectData.value = Tool.copy(level1.value);
 

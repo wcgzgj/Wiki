@@ -43,9 +43,11 @@
                     <span>{{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}</span>
                 </template>
 
-                <template v-slot:action="{ record }">
+                <template v-slot:action="{record}">
                     <a-space size="small">
-                        <router-link to="/admin/doc">
+                        <!--这里，加上 : ，说明后面的部分是动态的，即会将我们用""括起来的部分，全部当做变量-->
+                        <!--那之前字符串的部分，我们还需要用 '' 包裹起来-->
+                        <router-link :to=" '/admin/doc?ebookId=' + record.id">
                             <a-button type="primary">
                                 文档管理
                             </a-button>
