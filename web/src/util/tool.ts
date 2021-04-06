@@ -46,6 +46,7 @@ export class Tool {
                 result.push(c);
                 // 找出所有父节点是一级标签的节点
                 const children = Tool.array2Tree(array, c.id);
+                // 如果获取的 children 数组非空，就将其塞给其父节点
                 if (Tool.isNotEmpty(children)) {
                     // js真jb乱来，可以往对象里面随便塞其他对象
                     c.children = children;

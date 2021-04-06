@@ -74,19 +74,18 @@
                 <a-input v-model:value="doc.name" />
             </a-form-item>
             <a-form-item label="父文档">
-                <a-select
+                <a-tree-select
                         v-model:value="doc.parent"
-                        ref="select"
+                        style="width: 100%"
+                        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                        :tree-data="treeSelectData"
+                        placeholder="请选择父文档"
+                        tree-default-expand-all
+                        :replaceFields="{title: 'name',key: 'id',value: 'id'}"
                 >
-                    <a-select-option value="0">
-                        无
-                    </a-select-option>
-                    <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">
-                        {{c.name}}
-                    </a-select-option>
-                </a-select>
-
+                </a-tree-select>
             </a-form-item>
+
             <a-form-item label="顺序">
                 <a-input v-model:value="doc.sort" />
             </a-form-item>
@@ -112,7 +111,6 @@
                 name: ""
             });
 
-            const level1=ref();
 
             const columns = [
                 {
@@ -137,21 +135,23 @@
             ];
 
 
+
+            const level1=ref();
+
             /**
              * 数据查询
              * params在下面的 onMounted函数中，我们已经定义了
              **/
             const handleQuery = () => {
                 loading.value = true;
-                axios.get("/doc/all", {
-                    params: {
-                        name: docState.value.name
-                    }
-                }).then((response) => {
+                // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
+                level1.value = [];
+
+                axios.get("/doc/all").then((response) => {
                     loading.value=false;
                     const data = response.data;
                     if (data.success) {
-                        const data = response.data;
+
                         docs.value = data.content;
                         level1.value=[];
                         level1.value=Tool.array2Tree(docs.value,0);
@@ -165,6 +165,8 @@
 
 
             // -------- 表单 ---------
+            // 因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
+            const treeSelectData = ref();
             const doc=ref({});
             const modalVisible = ref(false);
             const modalLoading = ref(false);
@@ -190,6 +192,39 @@
                 });
             };
 
+
+            /**
+             * 将某节点及其子孙节点全部置为disabled
+             */
+            const setDisable = (treeSelectData, id) => {
+                // console.log(treeSelectData, id);
+                // 遍历数组，即遍历某一层节点
+                for (let i = 0; i < treeSelectData.length; i++) {
+                    const node = treeSelectData[i];
+                    if (node.id === id) {
+                        // 如果当前节点就是目标节点
+                        console.log("disabled", node);
+                        // 将目标节点设置为disabled
+                        node.disabled = true;
+
+                        // 遍历所有子节点，将所有子节点全部都加上disabled
+                        const children = node.children;
+                        if (Tool.isNotEmpty(children)) {
+                            for (let j = 0; j < children.length; j++) {
+                                setDisable(children, children[j].id)
+                            }
+                        }
+                    } else {
+                        // 如果当前节点不是目标节点，则到其子节点再找找看。
+                        const children = node.children;
+                        if (Tool.isNotEmpty(children)) {
+                            setDisable(children, id);
+                        }
+                    }
+                }
+            };
+
+
             /**
              * 编辑
              * 这里的const xxx=()=>{}
@@ -199,19 +234,16 @@
              * ()里面可以放参数
              */
             const edit = (record) => {
-                //因为整个页面中隐藏了一个表单
-                //我们点击edit以后，就会把这个隐藏的属性，设置为可见
-                //这样，就可以出现一个供我们编辑的表单了
-                //而且，表单中的数据，也可以通过 doc 来展示
-                //这个 doc 进行了双向绑定
                 modalVisible.value = true;
-
-                //编辑时复制对象，这样前端页面就不会在还没确认的情况下，响应式变化了
                 doc.value=Tool.copy(record);
 
-                // 我发现，使用雪花算法后，前端传入的id值，会出现精度偏差
-                //所以，需要加入一个jackson配置，具体配置，我写在文档里了
-                // console.log("传入的一整行的值为："+JSON.stringify(record));
+                // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
+                treeSelectData.value = Tool.copy(level1.value);
+                setDisable(treeSelectData.value, record.id);
+
+                // 为选择树添加一个"无"
+                treeSelectData.value.unshift({id: 0, name: '无'});
+
             };
 
 
@@ -222,6 +254,12 @@
                 modalVisible.value = true;
                 //因为在新增的时候,我们不希望表单中有初始数据
                 doc.value={};
+
+                treeSelectData.value = Tool.copy(level1.value);
+
+                // 为选择树添加一个"无"
+                // unshift 方法，是在前面添加（和 push 是反过来的）
+                treeSelectData.value.unshift({id: 0, name: '无'});
             };
 
             /**
@@ -230,7 +268,7 @@
              */
             const handelDelete=(id) => {
                 axios.delete("/doc/delete/" + id).then((response) => {
-                    const data = response.data;
+                    const data = response.data;  // data = commonResp
                     if (data.success) {
                         //如果删除成功，要重新查询后端数据
                         //从而能显示出是删除了一个数据
@@ -262,7 +300,9 @@
                 doc,
                 modalVisible,
                 modalLoading,
-                handleModalOk
+                handleModalOk,
+
+                treeSelectData
             }
         }
     });

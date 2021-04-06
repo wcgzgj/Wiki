@@ -143,6 +143,8 @@
              **/
             const handleQuery = () => {
                 loading.value = true;
+                //如果不清空数据，则编辑保存重新加载数据后，再点击编辑，则还是修改之前的数据
+                level1.value=[];
                 axios.get("/category/all", {
                     params: {
                         name: categoryState.value.name
