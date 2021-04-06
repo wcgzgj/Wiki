@@ -6,24 +6,17 @@
         <a-layout-content
                 :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
-            <a-row>
+            <a-row :gutter="24">
                 <a-col :span="8">
                     <p>
-                        <a-form
-                                layout="inline"
-                                :model="docState"
-                                @finish="handleQuery({page: 1,size: pagination.pageSize})"
-                        >
+                        <a-form layout="inline" :model="param">
                             <a-form-item>
-                                <a-button
-                                        type="primary"
-                                        html-type="submit"
-                                >
+                                <a-button type="primary" @click="handelQuery()">
                                     查询
                                 </a-button>
                             </a-form-item>
                             <a-form-item>
-                                <a-button type="primary" @click="add()" >
+                                <a-button type="primary" @click="add()">
                                     新增
                                 </a-button>
                             </a-form-item>
@@ -33,54 +26,47 @@
                             :columns="columns"
                             :row-key="record => record.id"
                             :data-source="level1"
-                            :pagination="false"
                             :loading="loading"
+                            :pagination="false"
+                            size="small"
                     >
-                        <template #cover="{ text: cover }">
-                            <img v-if="cover" :src="cover" alt="avatar" />
+                        <template #name="{text,record}">
+                            {{record.sort}} {{text}}
                         </template>
-
-                        <template v-slot:action="{ record }">
+                        <template v-slot:action="{record}">
                             <a-space size="small">
-                                <a-button type="primary" @click="edit(record)">
+                                <a-button type="primary" @click="edit(record)" size="small">
                                     编辑
                                 </a-button>
-
-                                <!--气泡确认框-->
                                 <a-popconfirm
-                                        title="删除后不可恢复，确认删除？"
-                                        ok-text="确认"
-                                        cancel-text="取消"
+                                        title="删除后不可恢复，确认删除?"
+                                        ok-text="是"
+                                        cancel-text="否"
                                         @confirm="handelDelete(record.id)"
                                 >
-                                    <!--delete是关键字，要用其他单词加以区分-->
-                                    <a-button type="danger">
+                                    <a-button type="danger" size="small">
                                         删除
                                     </a-button>
-
                                 </a-popconfirm>
-
-
                             </a-space>
                         </template>
                     </a-table>
                 </a-col>
-
-
                 <a-col :span="16">
-                    <!--<a-modal-->
-                    <!--        title="文档表单"-->
-                    <!--        v-model:visible="modalVisible"-->
-                    <!--        :confirm-loading="modalLoading"-->
-                    <!--        @ok="handleModalOk"-->
-                    <!--&gt;-->
-                    <!--    -->
-                    <!--</a-modal>-->
-                    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-                        <a-form-item label="名称">
-                            <a-input v-model:value="doc.name" />
+                    <p>
+                        <a-form layout="inline" :model="param">
+                            <a-form-item>
+                                <a-button type="primary" @click="handelSave()">
+                                    保存
+                                </a-button>
+                            </a-form-item>
+                        </a-form>
+                    </p>
+                    <a-form :model="doc" layout="vertical">
+                        <a-form-item>
+                            <a-input v-model:value="doc.name" placeholder="名称"/>
                         </a-form-item>
-                        <a-form-item label="父文档">
+                        <a-form-item>
                             <a-tree-select
                                     v-model:value="doc.parent"
                                     style="width: 100%"
@@ -88,21 +74,18 @@
                                     :tree-data="treeSelectData"
                                     placeholder="请选择父文档"
                                     tree-default-expand-all
-                                    :replaceFields="{title: 'name',key: 'id',value: 'id'}"
+                                    :replaceFields="{title: 'name', key: 'id', value: 'id'}"
                             >
                             </a-tree-select>
                         </a-form-item>
-
-                        <a-form-item label="顺序">
-                            <a-input v-model:value="doc.sort" />
+                        <a-form-item>
+                            <a-input v-model:value="doc.sort" placeholder="顺序"/>
                         </a-form-item>
-                        <a-form-item label="内容">
-                            <!--下面放置的内容，是富文本编辑器-->
+                        <a-form-item>
                             <div id="content"></div>
                         </a-form-item>
                     </a-form>
                 </a-col>
-
             </a-row>
 
         </a-layout-content>
@@ -135,21 +118,14 @@
             //富文本框对象
             const editor = new E('#content');
 
+            editor.config.zIndex = 0;
+
 
             const columns = [
                 {
                     title: '名称',
-                    dataIndex: 'name'
-                },
-                {
-                    title: '父文档',
-                    key: 'parent',
-                    dataIndex: 'parent'
-                },
-                {
-                    title: '顺序',
-                    key: 'sort',
-                    dataIndex: 'sort'
+                    dataIndex: 'name',
+                    slots: { customRender: 'name' }
                 },
                 {
                     title: '操作',
@@ -166,7 +142,7 @@
              * 数据查询
              * params在下面的 onMounted函数中，我们已经定义了
              **/
-            const handleQuery = () => {
+            const handelQuery = () => {
                 loading.value = true;
                 // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
                 level1.value = [];
@@ -194,7 +170,7 @@
             const doc=ref({});
             const modalVisible = ref(false);
             const modalLoading = ref(false);
-            const handleModalOk = () => {
+            const handelSave = () => {
                 modalLoading.value = true;
                 axios.post("/doc/save", doc.value).then((response) => {
                     const data = response.data; // data 其实就是commenResp
@@ -208,8 +184,8 @@
 
 
                         // 重新加载列表
-                        // 使用之前定义过的 handleQuery 函数
-                        handleQuery();
+                        // 使用之前定义过的 handelQuery 函数
+                        handelQuery();
                     } else {
                         message.error(data.message);
                     }
@@ -304,9 +280,6 @@
                 // 为选择树添加一个"无"
                 treeSelectData.value.unshift({id: 0, name: '无'});
 
-                setTimeout(function () {
-                    editor.create();
-                }, 100);
 
             };
 
@@ -328,9 +301,6 @@
                 // unshift 方法，是在前面添加（和 push 是反过来的）
                 treeSelectData.value.unshift({id: 0, name: '无'});
 
-                setTimeout(function () {
-                    editor.create();
-                }, 100);
             };
 
             /**
@@ -355,7 +325,7 @@
                             if (data.success) {
                                 //如果删除成功，要重新查询后端数据
                                 //从而能显示出是删除了一个数据
-                                handleQuery();
+                                handelQuery();
                             }
                         });
                     },
@@ -367,10 +337,8 @@
             onMounted(() => {
                 //每次新打开这个页面的时候
                 //都必须查询所有数据，显示在页面上
-                handleQuery();
-                // setTimeout(function () {
-                //     editor.create();
-                // }, 100);
+                handelQuery();
+                editor.create();
             });
 
 
@@ -379,7 +347,7 @@
                 columns,
                 loading,
                 docState,
-                handleQuery,
+                handelQuery,
                 level1,
 
                 edit,
@@ -389,7 +357,7 @@
                 doc,
                 modalVisible,
                 modalLoading,
-                handleModalOk,
+                handelSave,
 
                 treeSelectData
             }
