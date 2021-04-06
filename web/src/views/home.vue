@@ -117,11 +117,6 @@
     const isShowWelcome = ref(true);
     let categoryId2 =0;
 
-
-
-
-
-
     const handleClick = (value: any) => {
       console.log("menu click", value)
       if (value.key === 'welcome') {
@@ -133,6 +128,7 @@
       }
       // isShowWelcome.value = value.key === 'welcome';
     };
+
 
     const handelQueryEbook = () => {
       axios.get("/ebook/list",{

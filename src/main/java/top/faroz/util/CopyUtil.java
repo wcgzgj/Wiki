@@ -20,6 +20,8 @@ import java.util.Set;
 public class CopyUtil {
     /**
      * 单体复制
+     * 传入Class对象，是因为这样能传入类型信息
+     * 这样最后创建的对象，就不用强制类型转换了
      */
     public static<T> T copy(Object source, Class<T> clazz) {
         if (source == null) {
@@ -33,7 +35,10 @@ public class CopyUtil {
             e.printStackTrace();
             return null;
         }
-        //要忽略属性值为为空的属性
+        /**
+         * 要忽略属性值为为空的属性
+         * 第三个参数，是获取所有值为空的属性的名称数组
+         */
         BeanUtils.copyProperties(source, obj,getNullPropertyName(source));
 
         return obj;
