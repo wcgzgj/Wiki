@@ -12,6 +12,7 @@ import top.faroz.resp.PageResp;
 import top.faroz.service.DocService;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -66,13 +67,14 @@ public class DocController {
 
     /**
      * 按照id，删除对应的元素
-     * @param id
+     * @param idsStr
      * @return
      */
-    @DeleteMapping("/delete/{id}")
-    public CommonResp delete(@PathVariable Long id) {
+    @DeleteMapping("/delete/{idsStr}")
+    public CommonResp delete(@PathVariable String idsStr) {
         CommonResp resp = new CommonResp<>();
-        docService.delete(id);
+        List<String> list = Arrays.asList(idsStr.split(","));
+        docService.delete(list);
         return resp;
     }
 

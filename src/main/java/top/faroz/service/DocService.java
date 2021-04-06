@@ -17,6 +17,7 @@ import top.faroz.util.CopyUtil;
 import top.faroz.util.SnowFlake;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -136,11 +137,18 @@ public class DocService {
     }
 
     /**
-     * 根据主键删除元素
-     * @param id
+     * 根据一组主键，删除元素
+     * @param ids
      */
-    public void delete(Long id) {
-        mapper.deleteByPrimaryKey(id);
+    public void delete(List<String> ids) {
+        DocExample docExample = new DocExample();
+        DocExample.Criteria criteria = docExample.createCriteria();
+        ArrayList<Long> list = new ArrayList<>();
+        for (String id : ids) {
+            list.add(Long.parseLong(id));
+        }
+        criteria.andIdIn(list);
+        mapper.deleteByExample(docExample);
     }
 
 

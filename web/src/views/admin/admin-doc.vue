@@ -235,6 +235,37 @@
             };
 
 
+            let ids=[];
+
+            /**
+             * 查找整根树枝
+             */
+            const getDeleteIds = (treeSelectData, id) => {
+                // console.log(treeSelectData, id);
+                // 遍历数组，即遍历某一层节点
+                for (let i = 0; i < treeSelectData.length; i++) {
+                    const node = treeSelectData[i];
+                    if (node.id === id) {
+
+                        ids.push(id);
+                        // 遍历所有子节点
+                        const children = node.children;
+                        if (Tool.isNotEmpty(children)) {
+                            for (let j = 0; j < children.length; j++) {
+                                getDeleteIds(children, children[j].id)
+                            }
+                        }
+                    } else {
+                        // 如果当前节点不是目标节点，则到其子节点再找找看。
+                        const children = node.children;
+                        if (Tool.isNotEmpty(children)) {
+                            getDeleteIds(children, id);
+                        }
+                    }
+                }
+            };
+
+
             /**
              * 编辑
              * 这里的const xxx=()=>{}
@@ -280,7 +311,13 @@
              * @param id 传进来的，要用来判断删除的id
              */
             const handelDelete=(id) => {
-                axios.delete("/doc/delete/" + id).then((response) => {
+                /**
+                 * 定义了一个全局变量 ids
+                 * 当执行 getDeleteIds()后，就会把获得的数值，放入 ids 中
+                 * 所以，下面会直接使用一个 ids 变量
+                 */
+                getDeleteIds(level1.value,id);
+                axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
                     const data = response.data;  // data = commonResp
                     if (data.success) {
                         //如果删除成功，要重新查询后端数据
