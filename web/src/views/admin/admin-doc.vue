@@ -41,7 +41,6 @@
                             编辑
                         </a-button>
 
-
                         <!--气泡确认框-->
                         <a-popconfirm
                                 title="删除后不可恢复，确认删除？"
@@ -89,29 +88,34 @@
             <a-form-item label="顺序">
                 <a-input v-model:value="doc.sort" />
             </a-form-item>
+            <a-form-item label="内容">
+                <div id="content"></div>
+            </a-form-item>
         </a-form>
     </a-modal>
 </template>
 
 <script>
-    import {defineComponent, onMounted, ref} from 'vue';
+    import {defineComponent, onMounted, ref,createVNode} from 'vue';
     import axios from "axios";
     // 下面这个组件，是为了方便显示后端传来的校验的
-    import {message} from 'ant-design-vue';
+    import {message,Modal} from 'ant-design-vue';
     import {Tool} from "@/util/tool";
     import {useRoute} from "vue-router";
+    import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
+    import E from 'wangeditor';
 
     export default defineComponent({
         name: 'AdminDoc',
         setup() {
             const route=useRoute();
-            console.log("路由：", route);
-            console.log("route.path：", route.path);
-            console.log("route.query：", route.query);
-            console.log("route.param：", route.params);
-            console.log("route.fullPath：", route.fullPath);
-            console.log("route.name：", route.name);
-            console.log("route.meta：", route.meta);
+            // console.log("路由：", route);
+            // console.log("route.path：", route.path);
+            // console.log("route.query：", route.query);
+            // console.log("route.param：", route.params);
+            // console.log("route.fullPath：", route.fullPath);
+            // console.log("route.name：", route.name);
+            // console.log("route.meta：", route.meta);
 
             const docs = ref();
 
@@ -120,6 +124,9 @@
             const docState =ref({
                 name: ""
             });
+
+            //富文本框对象
+            const editor = new E('#content');
 
 
             const columns = [
@@ -235,7 +242,9 @@
             };
 
 
-            let ids=[];
+            // let ids=[];
+            const deleteIds= [];
+            const deleteNames= [];
 
             /**
              * 查找整根树枝
@@ -247,7 +256,10 @@
                     const node = treeSelectData[i];
                     if (node.id === id) {
 
-                        ids.push(id);
+                        // ids.push(id);
+                        deleteIds.push(id);
+                        deleteNames.push(node.name);
+
                         // 遍历所有子节点
                         const children = node.children;
                         if (Tool.isNotEmpty(children)) {
@@ -285,6 +297,10 @@
                 // 为选择树添加一个"无"
                 treeSelectData.value.unshift({id: 0, name: '无'});
 
+                setTimeout(function () {
+                    editor.create();
+                }, 100);
+
             };
 
 
@@ -304,6 +320,10 @@
                 // 为选择树添加一个"无"
                 // unshift 方法，是在前面添加（和 push 是反过来的）
                 treeSelectData.value.unshift({id: 0, name: '无'});
+
+                setTimeout(function () {
+                    editor.create();
+                }, 100);
             };
 
             /**
@@ -317,14 +337,23 @@
                  * 所以，下面会直接使用一个 ids 变量
                  */
                 getDeleteIds(level1.value,id);
-                axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
-                    const data = response.data;  // data = commonResp
-                    if (data.success) {
-                        //如果删除成功，要重新查询后端数据
-                        //从而能显示出是删除了一个数据
-                        handleQuery();
-                    }
+                Modal.confirm({
+                    title: '重要提醒',
+                    icon: createVNode(ExclamationCircleOutlined),
+                    content: '将删除：【' + deleteNames.join("，") + "】删除后不可恢复，确认删除？",
+                    onOk() {
+                        // console.log(ids)
+                        axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
+                            const data = response.data;  // data = commonResp
+                            if (data.success) {
+                                //如果删除成功，要重新查询后端数据
+                                //从而能显示出是删除了一个数据
+                                handleQuery();
+                            }
+                        });
+                    },
                 });
+
             };
 
 
