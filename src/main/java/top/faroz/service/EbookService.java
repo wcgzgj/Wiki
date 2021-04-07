@@ -64,6 +64,9 @@ public class EbookService {
             criteria.andCategory2IdEqualTo(req.getCategoryId2());
         }
 
+        /**
+         * 使用 PageHelper 帮助分页
+         */
         PageHelper.startPage(req.getPage(),req.getSize());
         List<Ebook> ebooks = mapper.selectByExample(ebookExample);
 
