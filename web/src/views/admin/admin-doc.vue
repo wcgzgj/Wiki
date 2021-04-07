@@ -170,6 +170,27 @@
                 });
             };
 
+            /**
+             * 内容查询
+             * params在下面的 onMounted函数中，我们已经定义了
+             **/
+            const handelQueryContent = () => {
+
+                axios.get("/doc/find-content/"+doc.value.id).then((response) => {
+
+                    const data = response.data;
+
+                    if (data.success) {
+                        /**
+                         * 将查询到的结果，放入富文本框
+                         */
+                        editor.txt.html(data.content);
+                    } else {
+                        message.error(data.message);
+                    }
+                });
+            };
+
 
 
             // -------- 表单 ---------
@@ -291,6 +312,7 @@
             const edit = (record) => {
                 modalVisible.value = true;
                 doc.value=Tool.copy(record);
+                handelQueryContent();
 
                 // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
                 treeSelectData.value = Tool.copy(level1.value);
