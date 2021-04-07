@@ -23,12 +23,14 @@
                         </a-form>
                     </p>
                     <a-table
+                            v-if="level1.length > 0"
                             :columns="columns"
                             :row-key="record => record.id"
                             :data-source="level1"
                             :loading="loading"
                             :pagination="false"
                             size="small"
+                            :defaultExpandAllRows="true"
                     >
                         <template #name="{text,record}">
                             {{record.sort}} {{text}}
@@ -118,6 +120,7 @@
             //富文本框对象
             const editor = new E('#content');
 
+            //将富文本框置于图层最底部，保证下拉框会在它上面
             editor.config.zIndex = 0;
 
 
@@ -137,6 +140,11 @@
 
 
             const level1=ref();
+            /**
+             * 因为在 table 组件中，需要使用 level1.value.length
+             * 所以，要对 level1 进行初始化，不然会出现空指针的问题
+             */
+            level1.value=[];
 
             /**
              * 数据查询
@@ -167,11 +175,22 @@
             // -------- 表单 ---------
             // 因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
             const treeSelectData = ref();
-            const doc=ref({});
-            const modalVisible = ref(false);
-            const modalLoading = ref(false);
+
+            const doc=ref();
+            doc.value={};
+
+            const modalVisible = ref();
+            modalVisible.value=false;
+
+            const modalLoading = ref();
+            modalLoading.value=false;
+
             const handelSave = () => {
+                console.log("执行保存操作");
                 modalLoading.value = true;
+                doc.value.content=editor.txt.html();
+                console.log(doc.value.content);
+
                 axios.post("/doc/save", doc.value).then((response) => {
                     const data = response.data; // data 其实就是commenResp
                     modalLoading.value = false;

@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import top.faroz.mapper.ContentMapper;
 import top.faroz.mapper.DocMapper;
+import top.faroz.pojo.Content;
 import top.faroz.pojo.Doc;
 import top.faroz.pojo.DocExample;
 import top.faroz.req.DocQueryReq;
@@ -35,7 +37,13 @@ public class DocService {
      * Resource功能和@AutoWired差不多，只不过，Resource是JDK自带的
      */
     @Resource
-    private DocMapper mapper;
+    private DocMapper docMapper;
+
+    /**
+     * 文档内容（富文本）接口
+     */
+    @Resource
+    private ContentMapper contentMapper;
 
     /**
      * 雪花算法，生成id
@@ -51,28 +59,8 @@ public class DocService {
      */
     public List<DocQueryResp> all() {
         DocExample docExample = new DocExample();
-        /**
-         * 自动生成的sql是这样的
-         * <select id="selectByExample" parameterType="top.faroz.pojo.DocExample" resultMap="BaseResultMap">
-         *     select
-         *     <if test="distinct">
-         *       distinct
-         *     </if>
-         *     <include refid="Base_Column_List" />
-         *     from doc
-         *     <if test="_parameter != null">
-         *       <include refid="Example_Where_Clause" />
-         *     </if>
-         *     <if test="orderByClause != null">
-         *       order by ${orderByClause}
-         *     </if>
-         *   </select>
-         *
-         *   最后的order by 会拼接上我们写的内容
-         *   即会成为 order by sort acs，即通过sort的升序排列
-         */
         docExample.setOrderByClause("sort asc");
-        List<Doc> docs = mapper.selectByExample(docExample);
+        List<Doc> docs = docMapper.selectByExample(docExample);
 
         //列表复制，将原类型，更改为 resp类型
         List<DocQueryResp> docResps = CopyUtil.copyList(docs, DocQueryResp.class);
@@ -94,16 +82,8 @@ public class DocService {
          * 这里就不设计动态查询了
          * 因为分类每次都是要全部列出来的
          */
-        // /**
-        //  * 动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
-        //  */
-        // if (!ObjectUtils.isEmpty(req.getName())) {
-        //     //设置模糊查询条件
-        //     criteria.andNameLike("%"+req.getName()+"%");
-        // }
-
         PageHelper.startPage(req.getPage(),req.getSize());
-        List<Doc> docs = mapper.selectByExample(docExample);
+        List<Doc> docs = docMapper.selectByExample(docExample);
 
         //列表复制，将原类型，更改为 resp类型
         List<DocQueryResp> docResps = CopyUtil.copyList(docs, DocQueryResp.class);
@@ -125,14 +105,31 @@ public class DocService {
      */
     public void save(DocSaveReq req) {
         Doc doc=CopyUtil.copy(req,Doc.class);
+        Content content = CopyUtil.copy(req, Content.class);
+
         if (ObjectUtils.isEmpty(req.getId())) {
 
             //新增
             doc.setId(snowFlake.nextId());
-            mapper.insert(doc);
+            docMapper.insert(doc);
+
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         } else {
             //更新
-            mapper.updateByPrimaryKey(doc);
+            docMapper.updateByPrimaryKey(doc);
+
+            /**
+             * updateByPrimaryKeyWithBLOBs表示更新带大字段的内容
+             * 因为我们的 content 包含文本这一大字段内容
+             * `content` mediumtext not null comment '内容',
+             * 处于效率考虑，Mybatis 自动生成的代码，特地添加了一个大字段更新方法
+             */
+            int affects = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (affects==0) {
+                content.setId(doc.getId());
+                contentMapper.insert(content);
+            }
         }
     }
 
@@ -148,7 +145,7 @@ public class DocService {
             list.add(Long.parseLong(id));
         }
         criteria.andIdIn(list);
-        mapper.deleteByExample(docExample);
+        docMapper.deleteByExample(docExample);
     }
 
 
