@@ -57,9 +57,10 @@ public class DocService {
      * 因为前端不需要分页，所以返回值只要是list就行
      * @return
      */
-    public List<DocQueryResp> all() {
+    public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
         docExample.setOrderByClause("sort asc");
+        docExample.createCriteria().andEbookIdEqualTo(ebookId);
         List<Doc> docs = docMapper.selectByExample(docExample);
 
         //列表复制，将原类型，更改为 resp类型
