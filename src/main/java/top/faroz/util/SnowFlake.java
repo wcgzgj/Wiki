@@ -2,8 +2,6 @@ package top.faroz.util;
 
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-
 /**
  * @ClassName SnowFlake
  * @Description TODO
@@ -102,22 +100,22 @@ public class SnowFlake {
         return System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws ParseException {
-        // 时间戳
-        // System.out.println(System.currentTimeMillis());
-        // System.out.println(new Date().getTime());
-        //
-        // String dateTime = "2021-01-01 08:00:00";
-        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        // System.out.println(sdf.parse(dateTime).getTime());
-
-        SnowFlake snowFlake = new SnowFlake(1, 1);
-
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) {
-            System.out.println(snowFlake.nextId());
-            System.out.println(System.currentTimeMillis() - start);
-        }
-    }
+    // public static void main(String[] args) throws ParseException {
+    //     // 时间戳
+    //     // System.out.println(System.currentTimeMillis());
+    //     // System.out.println(new Date().getTime());
+    //     //
+    //     // String dateTime = "2021-01-01 08:00:00";
+    //     // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    //     // System.out.println(sdf.parse(dateTime).getTime());
+    //
+    //     SnowFlake snowFlake = new SnowFlake(1, 1);
+    //
+    //     long start = System.currentTimeMillis();
+    //     for (int i = 0; i < 10; i++) {
+    //         System.out.println(snowFlake.nextId());
+    //         System.out.println(System.currentTimeMillis() - start);
+    //     }
+    // }
 
 }
