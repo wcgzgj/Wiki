@@ -117,6 +117,10 @@
                 name: ""
             });
 
+            // 因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
+            const treeSelectData = ref();
+            treeSelectData.value=[];
+
             //富文本框对象
             const editor = new E('#content');
 
@@ -156,7 +160,6 @@
                 level1.value = [];
 
 
-
                 axios.get("/doc/all/"+route.query.ebookId).then((response) => {
                     loading.value=false;
                     const data = response.data;
@@ -165,6 +168,11 @@
                         docs.value = data.content;
                         level1.value=[];
                         level1.value=Tool.array2Tree(docs.value,0);
+
+                        // 父文档下拉框初始化，相当于点击新增
+                        treeSelectData.value = Tool.copy(level1.value);
+                        // 为选择树添加一个"无"
+                        treeSelectData.value.unshift({id: 0, name: '无'});
 
                     } else {
                         message.error(data.message);
@@ -196,9 +204,6 @@
 
 
             // -------- 表单 ---------
-            // 因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
-            const treeSelectData = ref();
-
             const doc=ref();
             doc.value={};
 
