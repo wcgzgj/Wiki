@@ -207,7 +207,6 @@
             modalLoading.value=false;
 
             const handelSave = () => {
-                console.log("执行保存操作");
                 modalLoading.value = true;
                 doc.value.content=editor.txt.html();
                 console.log(doc.value.content);
@@ -217,10 +216,10 @@
                     modalLoading.value = false;
                     if (data.success) { //commenResp里就有一个布尔值 success，判断是不是成功
 
-                        // 保存成功以后，
-                        // 去掉模态框 modal
-                        // 去掉loading效果
-                        modalVisible.value = false;
+                        /**
+                         * antd 自带的属性
+                         */
+                        message.success("保存成功！");
 
 
                         // 重新加载列表
@@ -312,6 +311,8 @@
             const edit = (record) => {
                 modalVisible.value = true;
                 doc.value=Tool.copy(record);
+
+                editor.txt.html("");
                 handelQueryContent();
 
                 // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
@@ -329,8 +330,7 @@
              * 新增
              */
             const add = () => {
-                modalVisible.value = true;
-                //因为在新增的时候,我们不希望表单中有初始数据
+                editor.txt.html("");
                 doc.value={
                     //获取 url 中传入的 ebookId 信息
                     ebookId: route.query.ebookId
