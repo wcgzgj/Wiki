@@ -5,16 +5,18 @@ import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import top.faroz.mapper.ContentMapper;
+import top.faroz.exception.BusinessException;
+import top.faroz.exception.BusinessExceptionCode;
 import top.faroz.mapper.UserMapper;
 import top.faroz.pojo.Content;
 import top.faroz.pojo.User;
 import top.faroz.pojo.UserExample;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserSaveReq;
-import top.faroz.resp.UserQueryResp;
 import top.faroz.resp.PageResp;
+import top.faroz.resp.UserQueryResp;
 import top.faroz.util.CopyUtil;
 import top.faroz.util.SnowFlake;
 
@@ -38,12 +40,7 @@ public class UserService {
      */
     @Resource
     private UserMapper userMapper;
-
-    /**
-     * 文档内容（富文本）接口
-     */
-    @Resource
-    private ContentMapper contentMapper;
+    
 
     /**
      * 雪花算法，生成id
@@ -108,29 +105,50 @@ public class UserService {
         User user=CopyUtil.copy(req,User.class);
         Content content = CopyUtil.copy(req, Content.class);
 
+        /**
+         * req 中，没有 id,说明前端想要执行的是新增操作
+         */
         if (ObjectUtils.isEmpty(req.getId())) {
+            User userDB = selectByLoginName(req.getLoginName());
 
-            //新增
-            user.setId(snowFlake.nextId());
-            userMapper.insert(user);
+            /**
+             * 如果查出来用户为空，说明不存在该用户，则可以执行新增操作
+             */
+            if (ObjectUtils.isEmpty(userDB)) {
+                user.setId(snowFlake.nextId());
+                userMapper.insert(user);
+                /**
+                 * 如果查出来用户不为空，说明存在该用户，不可以执行新增操作
+                 */
+            } else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
 
-            content.setId(user.getId());
-            contentMapper.insert(content);
+            /**
+             * req 中，有 id,说明前端想要执行的是更新操作
+             */
         } else {
             //更新
             userMapper.updateByPrimaryKey(user);
+        }
+    }
 
-            /**
-             * updateByPrimaryKeyWithBLOBs表示更新带大字段的内容
-             * 因为我们的 content 包含文本这一大字段内容
-             * `content` mediumtext not null comment '内容',
-             * 处于效率考虑，Mybatis 自动生成的代码，特地添加了一个大字段更新方法
-             */
-            int affects = contentMapper.updateByPrimaryKeyWithBLOBs(content);
-            if (affects==0) {
-                content.setId(user.getId());
-                contentMapper.insert(content);
-            }
+
+    /**
+     * 根据用户名进行查询
+     * 用来鉴别数据库中是否存在该用户
+     * @param LoginName
+     * @return
+     */
+    public User selectByLoginName(String LoginName) {
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andLoginNameEqualTo(LoginName);
+        List<User> userList = userMapper.selectByExample(userExample);
+        if (CollectionUtils.isEmpty(userList)) {
+            return null;
+        } else {
+            return userList.get(0);
         }
     }
 
@@ -149,13 +167,6 @@ public class UserService {
         userMapper.deleteByExample(userExample);
     }
 
-    public String findContent(Long id) {
-        Content content = contentMapper.selectByPrimaryKey(id);
-        if (content==null) {
-            return "";
-        }
-        return content.getContent();
-    }
 
 
 }
