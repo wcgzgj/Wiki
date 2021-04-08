@@ -55,6 +55,7 @@ public class EbookService {
 
         /**
          * 动态sql，如果req中，没有传入名字，那么，就不设置模糊查询
+         * ObjectUtils.isEmpty可以判断，内容是否为 null，不为 null，可以判断是否为空（任意类型）
          */
         if (!ObjectUtils.isEmpty(req.getName())) {
             //设置模糊查询条件
