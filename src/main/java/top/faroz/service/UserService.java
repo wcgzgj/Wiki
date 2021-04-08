@@ -13,6 +13,7 @@ import top.faroz.mapper.UserMapper;
 import top.faroz.pojo.User;
 import top.faroz.pojo.UserExample;
 import top.faroz.req.UserQueryReq;
+import top.faroz.req.UserResetPasswordReq;
 import top.faroz.req.UserSaveReq;
 import top.faroz.resp.PageResp;
 import top.faroz.resp.UserQueryResp;
@@ -146,6 +147,19 @@ public class UserService {
         } else {
             return userList.get(0);
         }
+    }
+
+    /**
+     * 修改密码
+     * @param req
+     */
+    public void resetPassword(UserResetPasswordReq req) {
+        User user=CopyUtil.copy(req,User.class);
+        /**
+         * 因为我们的 UserResetPasswordReq只有 id 和 password
+         * 所以我们在更新的时候，要使用 selective，这样才不会让其他值变成 null
+         */
+        userMapper.updateByPrimaryKeySelective(user);
     }
 
 

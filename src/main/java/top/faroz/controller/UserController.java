@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import top.faroz.req.UserQueryReq;
+import top.faroz.req.UserResetPasswordReq;
 import top.faroz.req.UserSaveReq;
 import top.faroz.resp.CommonResp;
 import top.faroz.resp.PageResp;
@@ -68,6 +69,15 @@ public class UserController {
     public CommonResp delete(@PathVariable Long id) {
         CommonResp resp = new CommonResp<>();
         userService.delete(id);
+        return resp;
+    }
+
+    @PostMapping("/reset-password")
+    public CommonResp resetPassword(@RequestBody @Valid UserResetPasswordReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        userService.resetPassword(req);
+
+        CommonResp resp = new CommonResp<>();
         return resp;
     }
 
