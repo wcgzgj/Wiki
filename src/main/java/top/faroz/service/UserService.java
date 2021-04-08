@@ -109,6 +109,10 @@ public class UserService {
              */
             user.setLoginName(null);
             /**
+             * 不修改密码
+             */
+            user.setPassword(null);
+            /**
              * Selective 表示，当内容不为空的时候，才会去选择修改
              */
             userMapper.updateByPrimaryKeySelective(user);

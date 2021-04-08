@@ -64,7 +64,8 @@
             <a-form-item label="昵称">
                 <a-input v-model:value="user.name" />
             </a-form-item>
-            <a-form-item label="密码">
+            <!--v-show，是为了让我们在编辑的时候，无法修改密码-->
+            <a-form-item label="密码" v-show="!user.id">
                 <a-input v-model:value="user.password" />
             </a-form-item>
         </a-form>
