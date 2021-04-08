@@ -17,8 +17,7 @@
                     <a-form-item>
                         <a-button type="primary" @click="add()">
                             新增
-                        </a-button>U
-                    </a-form-item>
+                        </a-button>                    </a-form-item>
                 </a-form>
             </p>
             <a-table
@@ -60,7 +59,7 @@
             <a-form-item label="登录名">
                 <!--如果 user.id 有值，即是进行编辑操作的，就让输入框不可以更改-->
                 <!--因为我们不允许修改登录名-->
-                <a-input v-model:value="user.loginName" :disabled="user.id"/>
+                <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
             </a-form-item>
             <a-form-item label="昵称">
                 <a-input v-model:value="user.name" />
@@ -72,11 +71,15 @@
     </a-modal>
 </template>
 
-<script>
+<script lang="ts">
     import { defineComponent, onMounted, ref } from 'vue';
     import axios from 'axios';
     import { message } from 'ant-design-vue';
     import {Tool} from "@/util/tool";
+
+    declare let hexMd5;
+    declare let KEY;
+
 
     export default defineComponent({
         name: 'AdminUser',
@@ -114,7 +117,7 @@
             /**
              * 数据查询
              **/
-            const handleQuery = (params) => {
+            const handleQuery = (params: any) => {
                 loading.value = true;
                 // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
                 users.value = [];
@@ -142,7 +145,7 @@
             /**
              * 表格点击页码时触发
              */
-            const handleTableChange = (pagination) => {
+            const handleTableChange = (pagination: any) => {
                 console.log("看看自带的分页参数都有啥：" + pagination);
                 handleQuery({
                     page: pagination.current,
@@ -156,6 +159,13 @@
             const modalLoading = ref(false);
             const handleModalOk = () => {
                 modalLoading.value = true;
+
+                /**
+                 * 前端调用 MD5 加密算法
+                 * KEY 是盐值，让密码更为复杂
+                 */
+                user.value.password = hexMd5(user.value.password + KEY);
+
                 axios.post("/user/save", user.value).then((response) => {
                     modalLoading.value = false;
                     const data = response.data; // data = commonResp
@@ -176,7 +186,7 @@
             /**
              * 编辑
              */
-            const edit = (record) => {
+            const edit = (record: any) => {
                 modalVisible.value = true;
                 user.value = Tool.copy(record);
             };
@@ -189,7 +199,7 @@
                 user.value = {};
             };
 
-            const handleDelete = (id) => {
+            const handleDelete = (id: any) => {
                 axios.delete("/user/delete/" + id).then((response) => {
                     const data = response.data; // data = commonResp
                     if (data.success) {

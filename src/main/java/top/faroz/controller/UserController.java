@@ -3,12 +3,13 @@ package top.faroz.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserSaveReq;
 import top.faroz.resp.CommonResp;
-import top.faroz.resp.UserQueryResp;
 import top.faroz.resp.PageResp;
+import top.faroz.resp.UserQueryResp;
 import top.faroz.service.UserService;
 
 import javax.validation.Valid;
@@ -51,10 +52,10 @@ public class UserController {
      */
     @PostMapping("/save")
     public CommonResp save(@RequestBody @Valid UserSaveReq req) {
-
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        userService.save(req);
 
         CommonResp resp = new CommonResp<>();
-        userService.save(req);
         return resp;
     }
 
