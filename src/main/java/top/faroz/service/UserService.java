@@ -87,6 +87,15 @@ public class UserService {
                 user.setId(snowFlake.nextId());
                 userMapper.insert(user);
             } else {
+                /**
+                 * 因为 BusinessException 继承了 RuntimeException，
+                 * 又因为 RuntimeException 不需要 catch
+                 * 所以方法后面可以不用加 throw
+                 *
+                 * 但是这种方法不适合统一管理
+                 * 所以我们需要统一异常处理
+                 * (自己写了一个统一异常处理类 ControllerExceptionHandler)
+                 */
                 throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
         /**
