@@ -105,6 +105,7 @@ create table `user` (
   `name` varchar(50) comment '昵称',
   `password` char(32) not null comment '密码',
   primary key (`id`),
+  # 用户名设置唯一键
   unique key `login_name_unique` (`login_name`)
 ) engine=innodb default charset=utf8mb4 comment='用户';
 

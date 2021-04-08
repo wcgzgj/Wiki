@@ -11,6 +11,10 @@ public class BusinessException extends RuntimeException{
     private BusinessExceptionCode code;
 
     public BusinessException (BusinessExceptionCode code) {
+        /**
+         * 父类有个成员变量  private String desc
+         * 需要为这个成员变量赋值
+         */
         super(code.getDesc());
         this.code = code;
     }

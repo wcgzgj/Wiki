@@ -5,14 +5,17 @@ import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import top.faroz.exception.BusinessException;
+import top.faroz.exception.BusinessExceptionCode;
 import top.faroz.mapper.UserMapper;
 import top.faroz.pojo.User;
 import top.faroz.pojo.UserExample;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserSaveReq;
-import top.faroz.resp.UserQueryResp;
 import top.faroz.resp.PageResp;
+import top.faroz.resp.UserQueryResp;
 import top.faroz.util.CopyUtil;
 import top.faroz.util.SnowFlake;
 
@@ -34,7 +37,7 @@ public class UserService {
      * Resource功能和@AutoWired差不多，只不过，Resource是JDK自带的
      */
     @Resource
-    private UserMapper mapper;
+    private UserMapper userMapper;
 
     /**
      * 雪花算法，生成id
@@ -56,7 +59,7 @@ public class UserService {
         }
 
         PageHelper.startPage(req.getPage(),req.getSize());
-        List<User> users = mapper.selectByExample(userExample);
+        List<User> users = userMapper.selectByExample(userExample);
 
         List<UserQueryResp> userResps = CopyUtil.copyList(users, UserQueryResp.class);
 
@@ -76,14 +79,21 @@ public class UserService {
      */
     public void save(UserSaveReq req) {
         User user=CopyUtil.copy(req,User.class);
+        /**
+         * req无 id，新增
+         */
         if (ObjectUtils.isEmpty(req.getId())) {
-
-            //新增
-            user.setId(snowFlake.nextId());
-            mapper.insert(user);
+            if (ObjectUtils.isEmpty(selectByLoginName(req.getLoginName()))) {
+                user.setId(snowFlake.nextId());
+                userMapper.insert(user);
+            } else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
+        /**
+         * req 有 id，更新
+         */
         } else {
-            //更新
-            mapper.updateByPrimaryKey(user);
+            userMapper.updateByPrimaryKey(user);
         }
     }
 
@@ -92,7 +102,28 @@ public class UserService {
      * @param id
      */
     public void delete(Long id) {
-        mapper.deleteByPrimaryKey(id);
+        userMapper.deleteByPrimaryKey(id);
+    }
+
+    public User selectByLoginName(String loginName) {
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andLoginNameEqualTo(loginName);
+
+        /**
+         * 虽然查出来的最多只可能是一条
+         * 但是，我们还是要用 list 去接收
+         */
+        List<User> userList = userMapper.selectByExample(userExample);
+
+        /**
+         * 这里不用 size()==0去判断，是因为担心 userList 还可能是 null
+         */
+        if (CollectionUtils.isEmpty(userList)) {
+            return null;
+        } else {
+            return userList.get(0);
+        }
     }
 
 
