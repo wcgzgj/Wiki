@@ -102,7 +102,16 @@ public class UserService {
          * req 有 id，更新
          */
         } else {
-            userMapper.updateByPrimaryKey(user);
+            /**
+             * 我们将更新时的用户名设置为 null
+             * 是为了让下面的 selective 忽略用户名的修改
+             * 从而在后端实现防止用户修改用户名
+             */
+            user.setLoginName(null);
+            /**
+             * Selective 表示，当内容不为空的时候，才会去选择修改
+             */
+            userMapper.updateByPrimaryKeySelective(user);
         }
     }
 

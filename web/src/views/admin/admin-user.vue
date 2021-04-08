@@ -6,7 +6,7 @@
             <p>
                 <a-form layout="inline" :model="param">
                     <a-form-item>
-                        <a-input v-model:value="param.loginName" placeholder="登陆名">
+                        <a-input v-model:value="param.loginName" placeholder="登录名">
                         </a-input>
                     </a-form-item>
                     <a-form-item>
@@ -17,7 +17,7 @@
                     <a-form-item>
                         <a-button type="primary" @click="add()">
                             新增
-                        </a-button>
+                        </a-button>U
                     </a-form-item>
                 </a-form>
             </p>
@@ -29,7 +29,7 @@
                     :loading="loading"
                     @change="handleTableChange"
             >
-                <template v-slot:action="{ text, record }">
+                <template v-slot:action="{ record }">
                     <a-space size="small">
                         <a-button type="primary" @click="edit(record)">
                             编辑
@@ -57,8 +57,10 @@
             @ok="handleModalOk"
     >
         <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-            <a-form-item label="登陆名">
-                <a-input v-model:value="user.loginName" />
+            <a-form-item label="登录名">
+                <!--如果 user.id 有值，即是进行编辑操作的，就让输入框不可以更改-->
+                <!--因为我们不允许修改登录名-->
+                <a-input v-model:value="user.loginName" :disabled="user.id"/>
             </a-form-item>
             <a-form-item label="昵称">
                 <a-input v-model:value="user.name" />
@@ -91,7 +93,7 @@
 
             const columns = [
                 {
-                    title: '登陆名',
+                    title: '登录名',
                     dataIndex: 'loginName'
                 },
                 {
