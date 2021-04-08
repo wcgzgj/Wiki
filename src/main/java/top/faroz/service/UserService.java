@@ -5,23 +5,18 @@ import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import top.faroz.exception.BusinessException;
-import top.faroz.exception.BusinessExceptionCode;
 import top.faroz.mapper.UserMapper;
-import top.faroz.pojo.Content;
 import top.faroz.pojo.User;
 import top.faroz.pojo.UserExample;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserSaveReq;
-import top.faroz.resp.PageResp;
 import top.faroz.resp.UserQueryResp;
+import top.faroz.resp.PageResp;
 import top.faroz.util.CopyUtil;
 import top.faroz.util.SnowFlake;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,31 +34,13 @@ public class UserService {
      * Resource功能和@AutoWired差不多，只不过，Resource是JDK自带的
      */
     @Resource
-    private UserMapper userMapper;
-    
+    private UserMapper mapper;
 
     /**
      * 雪花算法，生成id
      */
     @Resource
     private SnowFlake snowFlake;
-
-
-    /**
-     * 返回所有分类数据
-     * 因为前端不需要分页，所以返回值只要是list就行
-     * @return
-     */
-    public List<UserQueryResp> all(Long userId) {
-        UserExample userExample = new UserExample();
-        userExample.setOrderByClause("sort asc");
-        userExample.createCriteria().andIdEqualTo(userId);
-        List<User> users = userMapper.selectByExample(userExample);
-
-        //列表复制，将原类型，更改为 resp类型
-        List<UserQueryResp> userResps = CopyUtil.copyList(users, UserQueryResp.class);
-        return userResps;
-    }
 
 
     /**
@@ -74,19 +51,15 @@ public class UserService {
     public PageResp<UserQueryResp> list(UserQueryReq req) {
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
+        if (!ObjectUtils.isEmpty(req.getLoginName())) {
+            criteria.andLoginNameEqualTo(req.getLoginName());
+        }
 
-
-        /**
-         * 这里就不设计动态查询了
-         * 因为分类每次都是要全部列出来的
-         */
         PageHelper.startPage(req.getPage(),req.getSize());
-        List<User> users = userMapper.selectByExample(userExample);
+        List<User> users = mapper.selectByExample(userExample);
 
-        //列表复制，将原类型，更改为 resp类型
         List<UserQueryResp> userResps = CopyUtil.copyList(users, UserQueryResp.class);
 
-        //       泛型类型是元素类型             要传入 查询到的数据列表
         PageInfo<User> info = new PageInfo<>(users);
 
         PageResp<UserQueryResp> pageResp = new PageResp<>();
@@ -103,70 +76,24 @@ public class UserService {
      */
     public void save(UserSaveReq req) {
         User user=CopyUtil.copy(req,User.class);
-        Content content = CopyUtil.copy(req, Content.class);
-
-        /**
-         * req 中，没有 id,说明前端想要执行的是新增操作
-         */
         if (ObjectUtils.isEmpty(req.getId())) {
-            User userDB = selectByLoginName(req.getLoginName());
 
-            /**
-             * 如果查出来用户为空，说明不存在该用户，则可以执行新增操作
-             */
-            if (ObjectUtils.isEmpty(userDB)) {
-                user.setId(snowFlake.nextId());
-                userMapper.insert(user);
-                /**
-                 * 如果查出来用户不为空，说明存在该用户，不可以执行新增操作
-                 */
-            } else {
-                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
-            }
-
-            /**
-             * req 中，有 id,说明前端想要执行的是更新操作
-             */
+            //新增
+            user.setId(snowFlake.nextId());
+            mapper.insert(user);
         } else {
             //更新
-            userMapper.updateByPrimaryKey(user);
-        }
-    }
-
-
-    /**
-     * 根据用户名进行查询
-     * 用来鉴别数据库中是否存在该用户
-     * @param LoginName
-     * @return
-     */
-    public User selectByLoginName(String LoginName) {
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
-        criteria.andLoginNameEqualTo(LoginName);
-        List<User> userList = userMapper.selectByExample(userExample);
-        if (CollectionUtils.isEmpty(userList)) {
-            return null;
-        } else {
-            return userList.get(0);
+            mapper.updateByPrimaryKey(user);
         }
     }
 
     /**
-     * 根据一组主键，删除元素
-     * @param ids
+     * 根据主键删除元素
+     * @param id
      */
-    public void delete(List<String> ids) {
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
-        ArrayList<Long> list = new ArrayList<>();
-        for (String id : ids) {
-            list.add(Long.parseLong(id));
-        }
-        criteria.andIdIn(list);
-        userMapper.deleteByExample(userExample);
+    public void delete(Long id) {
+        mapper.deleteByPrimaryKey(id);
     }
-
 
 
 }

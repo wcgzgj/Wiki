@@ -12,8 +12,6 @@ import top.faroz.resp.PageResp;
 import top.faroz.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @ClassName UserController
@@ -31,19 +29,14 @@ public class UserController {
     private UserService userService;
 
 
-    @RequestMapping("/all/{ebookId}")
-    public CommonResp all(@PathVariable Long ebookId) {
-        List<UserQueryResp> all = userService.all(ebookId);
-        CommonResp<List<UserQueryResp>> resp = new CommonResp<>();
-        resp.setContent(all);
-        return resp;
-    }
-
-
+    //GET http://localhost:8880/user/list?name=Spring
+    //上面的请求形式，Spring会自动映射，会将name映射到req中
+    //需要使用 @Valid开启校验规则 ，因为XxxReq都是集成自PageReq，PageReq上加了注解校验
     @RequestMapping("/list")
     public CommonResp list(@Valid UserQueryReq req) {
         PageResp<UserQueryResp> list = userService.list(req);
-
+        //这里用resp封装user的实体
+        //在controller层，不要出现实体类domain!!
         CommonResp<PageResp<UserQueryResp>> resp = new CommonResp<>();
         resp.setContent(list);
         return resp;
@@ -67,22 +60,13 @@ public class UserController {
 
     /**
      * 按照id，删除对应的元素
-     * @param idsStr
+     * @param id
      * @return
      */
-    @DeleteMapping("/delete/{idsStr}")
-    public CommonResp delete(@PathVariable String idsStr) {
+    @DeleteMapping("/delete/{id}")
+    public CommonResp delete(@PathVariable Long id) {
         CommonResp resp = new CommonResp<>();
-        List<String> list = Arrays.asList(idsStr.split(","));
-        userService.delete(list);
-        return resp;
-    }
-
-    @RequestMapping("/find-content/{id}")
-    public CommonResp findContent(@PathVariable Long id) {
-        CommonResp<String> resp = new CommonResp<>();
-        String content = userService.findContent(id);
-        resp.setContent(content);
+        userService.delete(id);
         return resp;
     }
 
