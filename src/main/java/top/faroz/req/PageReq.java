@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @ClassName PageReq
@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 
 public class PageReq {
-    @NotNull(message = "【页码】不能为空")
+    @NotEmpty(message = "【页码】不能为空")
     private int page;
 
     /**
@@ -30,7 +30,7 @@ public class PageReq {
      * 如果不做校验，让别人用脚本直接已下载查出来
      * 那服务器就挂掉了
      */
-    @NotNull(message = "【每页条数】不能为空")
+    @NotEmpty(message = "【每页条数】不能为空")
     @Max(value = 1000,message = "【每页条数】不能超过1000")
     private int size;
 }
