@@ -65,6 +65,7 @@
     import { defineComponent, ref } from 'vue';
     import axios from "axios";
     import {message} from "ant-design-vue";
+    import store from "@/store";
 
     declare let hexMd5;
     declare let KEY;
@@ -106,6 +107,13 @@
                         loginModalVisible.value=false;
                         message.success("登录成功!")
                         user.value=data.content;
+                        /**
+                         * setUser: vuex 中 mutations中的方法
+                         *
+                         * 后面的参数，都是我们在 mutations 中自定义方法的参数
+                         * state 参数因为是自带的，所以没有必要写
+                         */
+                        store.commit("setUser",user.value);
                     } else {
                         /**
                          * 使用 antd 的组件，弹出错误信息
