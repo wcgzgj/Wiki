@@ -134,7 +134,7 @@ public class UserController {
          *
          * 3600*24: 设置超时时间
          */
-        redisTemplate.opsForValue().set(token, JSONObject.toJSON(userLoginResp),3600*24, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(token.toString(), JSONObject.toJSON(userLoginResp),3600*24, TimeUnit.SECONDS);
 
         resp.setContent(userLoginResp);
         return resp;
