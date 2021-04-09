@@ -28,12 +28,27 @@
                 <router-link to="/about">关于我们</router-link>
             </a-menu-item>
 
+
+            <!--气泡确认框-->
+            <a-popconfirm
+                    title="是否退出？"
+                    ok-text="确认"
+                    cancel-text="取消"
+                    @confirm="logout"
+            >
+                <a class="login-menu" v-show="user.id">
+                    <span>退出登录</span>
+                </a>
+            </a-popconfirm>
+
             <!--下面两个部分，是互斥显示的-->
             <!--当 user 有数据的时候，显示 您好: xxx-->
             <!--当 user 没有数据的时候，说明没有登录，就显示登录按钮-->
             <a class="login-menu" v-show="user.id">
                 <span>你好: {{user.name}}</span>
             </a>
+
+
             <a class="login-menu" @click="showLoginModal" v-show="!user.id">
                 <span>登录</span>
             </a>
@@ -93,6 +108,9 @@
             }
 
 
+            /**
+             * 登录
+             */
             const login = () => {
                 console.log("开始登录!")
                 loginModalLoading.value=true;
@@ -105,14 +123,40 @@
                     if (data.success) {
                         loginModalVisible.value=false;
                         message.success("登录成功!")
-                        user.value=data.content;
                         /**
                          * setUser: vuex 中 mutations中的方法
                          *
                          * 后面的参数，都是我们在 mutations 中自定义方法的参数
                          * state 参数因为是自带的，所以没有必要写
                          */
-                        store.commit("setUser",user.value);
+                        store.commit("setUser",data.content);
+                    } else {
+                        /**
+                         * 使用 antd 的组件，弹出错误信息
+                         */
+                        message.error(data.message);
+                    }
+                });
+            }
+
+            /**
+             * 退出登录
+             */
+            const logout = () => {
+                console.log("退出登录!")
+
+                axios.get("/user/logout/"+user.value.token).then((response)=>{
+                    const data = response.data;
+                    if (data.success) {
+                        loginModalVisible.value=false;
+                        message.success("退出登录成功!")
+
+                        /**
+                         * 退出登录时
+                         * 将 sessionStorage 中对应 user的信息清空
+                         * 因为
+                         */
+                        store.commit("setUser", {});
                     } else {
                         /**
                          * 使用 antd 的组件，弹出错误信息
@@ -131,7 +175,8 @@
 
                 //method
                 showLoginModal,
-                login
+                login,
+                logout
             }
         }
     }
@@ -141,6 +186,7 @@
     .login-menu {
         float: right;
         color: white;
+        padding-left: 10px;
     }
 
 </style>

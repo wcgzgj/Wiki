@@ -91,6 +91,11 @@ public class UserController {
         return resp;
     }
 
+    /**
+     * 重置密码
+     * @param req
+     * @return
+     */
     @PostMapping("/reset-password")
     public CommonResp resetPassword(@RequestBody @Valid UserResetPasswordReq req) {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
@@ -132,6 +137,19 @@ public class UserController {
         redisTemplate.opsForValue().set(token, JSONObject.toJSON(userLoginResp),3600*24, TimeUnit.SECONDS);
 
         resp.setContent(userLoginResp);
+        return resp;
+    }
+
+    /**
+     * 登出
+     * @param token
+     * @return
+     */
+    @GetMapping("/logout/{token}")
+    public CommonResp logout(@PathVariable String token) {
+        CommonResp resp = new CommonResp<>();
+        redisTemplate.delete(token);
+        LOG.info("从 redis 中删除 token:{}",token);
         return resp;
     }
 
