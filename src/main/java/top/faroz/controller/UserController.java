@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import top.faroz.req.UserLoginReq;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserResetPasswordReq;
 import top.faroz.req.UserSaveReq;
 import top.faroz.resp.CommonResp;
 import top.faroz.resp.PageResp;
+import top.faroz.resp.UserLoginResp;
 import top.faroz.resp.UserQueryResp;
 import top.faroz.service.UserService;
 
@@ -78,6 +80,19 @@ public class UserController {
         userService.resetPassword(req);
 
         CommonResp resp = new CommonResp<>();
+        return resp;
+    }
+
+    /**
+     * 用户登录
+     * @param req
+     * @return
+     */
+    @PostMapping("/login")
+    public CommonResp login(@RequestBody @Valid UserLoginReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp<UserLoginResp> resp = new CommonResp<>();
+        UserLoginResp userLoginResp = userService.login(req);
         return resp;
     }
 

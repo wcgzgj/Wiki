@@ -12,10 +12,12 @@ import top.faroz.exception.BusinessExceptionCode;
 import top.faroz.mapper.UserMapper;
 import top.faroz.pojo.User;
 import top.faroz.pojo.UserExample;
+import top.faroz.req.UserLoginReq;
 import top.faroz.req.UserQueryReq;
 import top.faroz.req.UserResetPasswordReq;
 import top.faroz.req.UserSaveReq;
 import top.faroz.resp.PageResp;
+import top.faroz.resp.UserLoginResp;
 import top.faroz.resp.UserQueryResp;
 import top.faroz.util.CopyUtil;
 import top.faroz.util.SnowFlake;
@@ -161,6 +163,32 @@ public class UserService {
          */
         userMapper.updateByPrimaryKeySelective(user);
     }
+
+    /**
+     * 登录
+     *
+     * 当用户名不存在或者密码错误的时候，我们不能单独输出
+     * 而是应该输出 用户名不存在或密码错误  这样如果有黑客试图攻击的话，
+     * 就无法判断是用户名错误，还是密码错误了
+     * @param req
+     */
+    public UserLoginResp login(UserLoginReq req) {
+        User userDB = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDB)) {
+            LOG.info("用户名不存在, {}", req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        } else {
+            if (userDB.getPassword().equals(req.getPassword())) {
+                //登陆成功
+                UserLoginResp userLoginResp = CopyUtil.copy(userDB, UserLoginResp.class);
+                return userLoginResp;
+            } else {
+                LOG.info("密码不对, 输入密码：{}, 数据库密码：{}", req.getPassword(), userDB.getPassword());
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
+    }
+
 
 
 }
