@@ -1,8 +1,10 @@
 package top.faroz.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import top.faroz.req.UserLoginReq;
@@ -14,8 +16,11 @@ import top.faroz.resp.PageResp;
 import top.faroz.resp.UserLoginResp;
 import top.faroz.resp.UserQueryResp;
 import top.faroz.service.UserService;
+import top.faroz.util.SnowFlake;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName UserController
@@ -31,6 +36,18 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 雪花算法，生成id
+     */
+    @Resource
+    private SnowFlake snowFlake;
+
+    /**
+     * redis 工具
+     */
+    @Resource
+    private RedisTemplate redisTemplate;
 
 
     //GET http://localhost:8880/user/list?name=Spring
@@ -93,6 +110,28 @@ public class UserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp<UserLoginResp> resp = new CommonResp<>();
         UserLoginResp userLoginResp = userService.login(req);
+
+        /**
+         * redis需要我们手动生成一个不会重复的字符串，作为 token
+         * 用 UUID，雪花算法，都可以
+         */
+        Long token = snowFlake.nextId();
+        // {} 是 LOG 中的占位符
+        LOG.info("生成单点登录 token:{}",token);
+        userLoginResp.setToken(token.toString());
+
+        /**
+         * token: 手动生成的 token 作为 redis 的 key
+         *
+         * JSONObject.toJSON(userLoginResp): 作为 redis 的 value,
+         * 这个 value 需要序列化，可以让 userLoginResp 实现Serializable接口，
+         * 也可以像下面一样，将其转成 JSON 字符串
+         *
+         * 3600*24: 设置超时时间
+         */
+        redisTemplate.opsForValue().set(token, JSONObject.toJSON(userLoginResp),3600*24, TimeUnit.SECONDS);
+
+        resp.setContent(userLoginResp);
         return resp;
     }
 

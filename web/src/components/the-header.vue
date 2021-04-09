@@ -28,7 +28,13 @@
                 <router-link to="/about">关于我们</router-link>
             </a-menu-item>
 
-            <a class="login-menu" @click="showLoginModal">
+            <!--下面两个部分，是互斥显示的-->
+            <!--当 user 有数据的时候，显示 您好: xxx-->
+            <!--当 user 没有数据的时候，说明没有登录，就显示登录按钮-->
+            <a class="login-menu" v-show="user.id">
+                <span>你好: {{user.name}}</span>
+            </a>
+            <a class="login-menu" @click="showLoginModal" v-show="!user.id">
                 <span>登录</span>
             </a>
 
@@ -70,8 +76,11 @@
             const loginUser = ref();
             loginUser.value= {
                 loginName: "test",
-                password: "test"
+                password: "abc123"
             };
+
+            const user = ref();
+            user.value={}; // 初始化好习惯，避免空指针
 
             const loginModalVisible = ref();
             loginModalVisible.value=false;
@@ -96,6 +105,7 @@
                     if (data.success) {
                         loginModalVisible.value=false;
                         message.success("登录成功!")
+                        user.value=data.content;
                     } else {
                         /**
                          * 使用 antd 的组件，弹出错误信息
@@ -110,6 +120,7 @@
                 loginUser,
                 loginModalVisible,
                 loginModalLoading,
+                user,
 
                 //method
                 showLoginModal,

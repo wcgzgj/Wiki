@@ -12,6 +12,12 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  # redis配置
+  redis:
+    host: r-uf6ljbcdaxobsifyctpd.redis.rds.aliyuncs.com
+    port: 6379
+    password: Redis000
+
 # 整合Mybatis
 mybatis:
   # ** 表示在mapper下不管有多少文件夹，都可以全部识别
@@ -20,3 +26,7 @@ mybatis:
   #  打印sql相关的日志信息
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+

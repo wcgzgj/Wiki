@@ -1,7 +1,7 @@
 package top.faroz.req;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class CategorySaveReq {
     private Long id;
@@ -11,7 +11,7 @@ public class CategorySaveReq {
     @NotBlank(message = "【名称】不能为空")
     private String name;
 
-    @NotEmpty(message = "【排序】不能为空")
+    @NotNull(message = "【排序】不能为空")
     private Integer sort;
 
     public Long getId() {

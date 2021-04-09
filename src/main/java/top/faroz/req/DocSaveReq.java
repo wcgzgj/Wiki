@@ -1,14 +1,15 @@
 package top.faroz.req;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class DocSaveReq {
     private Long id;
 
-    @NotEmpty(message = "【电子书】不能为空")
+    @NotNull(message = "【电子书】不能为空")
     private Long ebookId;
 
-    @NotEmpty(message = "【父文档】不能为空")
+    @NotNull(message = "【父文档】不能为空")
     private Long parent;
 
     @NotEmpty(message = "【名称】不能为空")
