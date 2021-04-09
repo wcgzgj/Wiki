@@ -55,8 +55,13 @@
 
 </template>
 
-<script>
+<script lang="ts">
     import { defineComponent, ref } from 'vue';
+    import axios from "axios";
+    import {message} from "ant-design-vue";
+
+    declare let hexMd5;
+    declare let KEY;
 
     export default {
         name: "the-header",
@@ -78,8 +83,26 @@
                 loginModalVisible.value=true;
             }
 
+
             const login = () => {
                 console.log("开始登录!")
+                loginModalLoading.value=true;
+
+                loginUser.value.password = hexMd5(loginUser.value.password + KEY);
+
+                axios.post("/user/login",loginUser.value).then((response)=>{
+                    loginModalLoading.value=false;
+                    const data = response.data;
+                    if (data.success) {
+                        loginModalVisible.value=false;
+                        message.success("登录成功!")
+                    } else {
+                        /**
+                         * 使用 antd 的组件，弹出错误信息
+                         */
+                        message.error(data.message);
+                    }
+                });
             }
 
             return {

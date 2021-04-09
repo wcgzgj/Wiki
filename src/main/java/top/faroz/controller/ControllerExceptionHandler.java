@@ -12,6 +12,9 @@ import top.faroz.resp.CommonResp;
 
 /**
  * 统一异常处理、数据预处理等
+ * 该类用于捕获系统弹出的异常
+ * 将异常包装成一个 CommonResp
+ * 从而方便前端调用，显示错误信息
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
