@@ -1,6 +1,6 @@
 <template>
     <a-layout-footer style="text-align: center">
-        FARO_Z 电子书，欢迎：{{user.name}}
+        FARO_Z 电子书<span v-show="user.id">，欢迎：{{user.name}}</span>
     </a-layout-footer>
 </template>
 
@@ -16,14 +16,6 @@
             // 如果缓存监听的内容没有变化，那就直接从缓冲中取
             // 如果缓存监听的内容发生了插入、更新等操作，那就修改缓存，user 的值也随之改变
             const user = computed(() => store.state.user);
-
-            // const user = ref();
-            // user.value=store.state.user;
-
-            // const user = ref();
-            // user.value=computed(()=> {
-            //     store.state.user;
-            // })
 
             return {
                 user

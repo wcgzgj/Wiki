@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, ref ,computed} from 'vue';
     import axios from "axios";
     import {message} from "ant-design-vue";
     import store from "@/store";
@@ -80,8 +80,7 @@
                 password: "abc123"
             };
 
-            const user = ref();
-            user.value={}; // 初始化好习惯，避免空指针
+            const user = computed(() => store.state.user);
 
             const loginModalVisible = ref();
             loginModalVisible.value=false;
