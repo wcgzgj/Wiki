@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 因为项目启动的时候，会提示DataSource的问题，从而导致项目无法启动，这里只能暂时加上
@@ -14,6 +15,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @SpringBootApplication
 @ComponentScan("top.faroz") //因为启动类移动了位置，所以需要为其加上注解，使其可以去扫描其他组件
 @MapperScan("top.faroz.mapper") //mybatis mapper接口扫描
+@EnableScheduling
 public class WikiApplication {
 
     //配置了live template 模板后 可以使用  logf  快速生成
