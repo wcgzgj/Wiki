@@ -206,5 +206,13 @@ public class DocService {
         }
     }
 
+    /**
+     * 更新电子书信息
+     * 将文档信息存入电子书
+     */
+    public void updateDocInfo() {
+        docMapperCust.updateEbookInfo();
+    }
+
 
 }

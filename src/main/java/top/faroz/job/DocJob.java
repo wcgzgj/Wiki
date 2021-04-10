@@ -16,29 +16,20 @@ import java.util.Date;
  * @Version 1.0
  **/
 @Component
-public class TestJob {
-    private static final Logger LOG = LoggerFactory.getLogger(TestJob.class);
+public class DocJob {
+    private static final Logger LOG = LoggerFactory.getLogger(DocJob.class);
 
-    /**
-     * 固定时间间隔，fixedRate单位毫秒
-     */
-    @Scheduled(fixedRate = 1000)
-    public void simple() throws InterruptedException {
-        SimpleDateFormat formatter = new SimpleDateFormat("mm:ss");
-        String dateString = formatter.format(new Date());
-        Thread.sleep(2000);
-        LOG.info("每隔5秒钟执行一次： {}", dateString);
-    }
 
     /**
      * 自定义cron表达式跑批
      * 只有等上一次执行完成，下一次才会在下一个时间点执行，错过就错过
+     * cron 表达式不用记，可以在这个网址生成：https://cron.qqe2.com/
+     *
+     * 下面这段表示：每隔 30 秒，更新一次电子书信息
      */
-    @Scheduled(cron = "*/1 * * * * ?")
+    @Scheduled(cron = "1/30 * * * * ? ")
     public void cron() throws InterruptedException {
         SimpleDateFormat formatter = new SimpleDateFormat("mm:ss SSS");
         String dateString = formatter.format(new Date());
-        Thread.sleep(1500);
-        LOG.info("每隔1秒钟执行一次： {}", dateString);
     }
 }
