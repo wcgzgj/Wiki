@@ -14,4 +14,6 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface DocMapperCust {
     void viewCountIncrease(@Param("id") Long id);
+
+    void voteCountIncrease(@Param("id") Long id);
 }

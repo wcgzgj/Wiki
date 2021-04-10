@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.faroz.req.DocQueryReq;
 import top.faroz.req.DocSaveReq;
-import top.faroz.resp.DocQueryResp;
 import top.faroz.resp.CommonResp;
+import top.faroz.resp.DocQueryResp;
 import top.faroz.resp.PageResp;
 import top.faroz.service.DocService;
 
@@ -84,6 +84,13 @@ public class DocController {
         String content = docService.findContent(id);
         resp.setContent(content);
         return resp;
+    }
+
+    @GetMapping("/vote/{id}")
+    public CommonResp vote(@PathVariable Long id) {
+        CommonResp commonResp = new CommonResp();
+        docService.vote(id);
+        return commonResp;
     }
 
 }

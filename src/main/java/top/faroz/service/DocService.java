@@ -159,6 +159,11 @@ public class DocService {
         docMapper.deleteByExample(docExample);
     }
 
+    /**
+     * 将文章内容查找出来
+     * @param id
+     * @return
+     */
     public String findContent(Long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
         if (content==null) {
@@ -166,6 +171,14 @@ public class DocService {
         }
         docMapperCust.viewCountIncrease(id);
         return content.getContent();
+    }
+
+    /**
+     * 文章点赞数+1
+     * @param id
+     */
+    public void vote(Long id) {
+        docMapperCust.voteCountIncrease(id);
     }
 
 

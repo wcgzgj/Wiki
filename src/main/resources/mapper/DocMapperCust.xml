@@ -5,8 +5,12 @@
 <!--namespace要和接口的位置和名字对应-->
 <mapper namespace="top.faroz.mapper.DocMapperCust">
 
-    <update id="viewCountIncrease" >
+    <update id="viewCountIncrease">
         update doc set view_count=view_count+1 where id=#{id};
+    </update>
+
+    <update id="voteCountIncrease">
+        update doc set vote_count=vote_count+1 where id=#{id};
     </update>
 
 </mapper>
