@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import top.faroz.util.RequestContext;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -57,7 +58,7 @@ public class LogAspect {
         LOG.info("类名方法: {}.{}", signature.getDeclaringTypeName(), name);
         LOG.info("远程地址: {}", request.getRemoteAddr());
 
-        // RequestContext.setRemoteAddr(getRemoteIp(request));
+        RequestContext.setRemoteAddr(getRemoteIp(request));
 
         // 拿到所有的参数
         Object[] args = joinPoint.getArgs();
@@ -94,22 +95,24 @@ public class LogAspect {
         return result;
     }
 
-    // /**
-    //  * 使用nginx做反向代理，需要用该方法才能取到真实的远程IP
-    //  * @param request
-    //  * @return
-    //  */
-    // public String getRemoteIp(HttpServletRequest request) {
-    //     String ip = request.getHeader("x-forwarded-for");
-    //     if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    //         ip = request.getHeader("Proxy-Client-IP");
-    //     }
-    //     if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    //         ip = request.getHeader("WL-Proxy-Client-IP");
-    //     }
-    //     if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    //         ip = request.getRemoteAddr();
-    //     }
-    //     return ip;
-    // }
+    /**
+     * 使用nginx做反向代理，需要用该方法才能取到真实的远程IP
+     * 当我们发布上线后，因为前端、后端都是用80端口，会冲突
+     * 所以用户访问的时候，需要先去访问 nginx，然后，让 nginx 去反向代理，找我们要访问的路径
+     * @param request
+     * @return
+     */
+    public String getRemoteIp(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
 }

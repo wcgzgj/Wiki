@@ -4,8 +4,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import top.faroz.exception.BusinessException;
+import top.faroz.exception.BusinessExceptionCode;
 import top.faroz.mapper.ContentMapper;
 import top.faroz.mapper.DocMapper;
 import top.faroz.mapper.DocMapperCust;
@@ -17,6 +20,8 @@ import top.faroz.req.DocSaveReq;
 import top.faroz.resp.DocQueryResp;
 import top.faroz.resp.PageResp;
 import top.faroz.util.CopyUtil;
+import top.faroz.util.RedisUtil;
+import top.faroz.util.RequestContext;
 import top.faroz.util.SnowFlake;
 
 import javax.annotation.Resource;
@@ -58,6 +63,18 @@ public class DocService {
      */
     @Resource
     private SnowFlake snowFlake;
+
+    /**
+     * redis 工具类
+     * 这里 utils 之所以需要让 spring 实例化
+     * 是因为 redisUtil 中，用到了：
+     * @Resource
+     * private RedisTemplate redisTemplate;
+     *
+     * 如果在 redisUtil中，使用静态方法，会报错
+     */
+    @Resource
+    public RedisUtil redisUtil;
 
 
     /**
@@ -178,7 +195,15 @@ public class DocService {
      * @param id
      */
     public void vote(Long id) {
-        docMapperCust.voteCountIncrease(id);
+        // docMapperCust.voteCountIncrease(id);
+        // docMapperCust.increaseVoteCount(id);
+        // 远程IP+doc.id作为key，24小时内不能重复
+        String ip = RequestContext.getRemoteAddr();
+        if (redisUtil.validateRepeat("DOC_VOTE_" + id + "_" + ip, 3600 * 24)) {
+            docMapperCust.voteCountIncrease(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
     }
 
 
