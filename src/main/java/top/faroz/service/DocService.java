@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import top.faroz.mapper.ContentMapper;
 import top.faroz.mapper.DocMapper;
+import top.faroz.mapper.DocMapperCust;
 import top.faroz.pojo.Content;
 import top.faroz.pojo.Doc;
 import top.faroz.pojo.DocExample;
@@ -44,6 +45,13 @@ public class DocService {
      */
     @Resource
     private ContentMapper contentMapper;
+
+    /**
+     * 阅读，文章阅读数+1接口
+     */
+    @Resource
+    private DocMapperCust docMapperCust;
+
 
     /**
      * 雪花算法，生成id
@@ -112,6 +120,8 @@ public class DocService {
 
             //新增
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
 
             content.setId(doc.getId());
@@ -154,6 +164,7 @@ public class DocService {
         if (content==null) {
             return "";
         }
+        docMapperCust.viewCountIncrease(id);
         return content.getContent();
     }
 

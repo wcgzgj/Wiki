@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace要和接口的位置和名字对应-->
+<mapper namespace="top.faroz.mapper.DocMapperCust">
+
+    <update id="viewCountIncrease" >
+        update doc set view_count=view_count+1 where id=#{id};
+    </update>
+
+</mapper>
