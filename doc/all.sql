@@ -1,4 +1,3 @@
-insert into `test`(id,name) values(2,'FARO_Z')
 
 # demo列表
 drop table if exists `demo`;

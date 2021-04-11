@@ -9,9 +9,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/**
- * 因为项目启动的时候，会提示DataSource的问题，从而导致项目无法启动，这里只能暂时加上
- */
 @SpringBootApplication
 @ComponentScan("top.faroz") //因为启动类移动了位置，所以需要为其加上注解，使其可以去扫描其他组件
 @MapperScan("top.faroz.mapper") //mybatis mapper接口扫描
