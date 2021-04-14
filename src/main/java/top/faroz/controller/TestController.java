@@ -23,7 +23,7 @@ public class TestController {
     private TestService testService;
 
 
-
+    //从配置文件中，读取信息  :后面是默认值，如果配置文件中没有，会去使用
     @Value("${test.hello:TEST}")
     private String data;
 
